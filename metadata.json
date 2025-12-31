@@ -1,0 +1,7 @@
+{
+  "name": "Culinary AI",
+  "description": "An intelligent recipe explorer that categorizes dishes by country and style, using Gemini to generate detailed recipes, history, and cooking tips in a cinematic kitchen interface.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
