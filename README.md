@@ -12,7 +12,10 @@ View your app in AI Studio: https://ai.studio/apps/drive/1zixrS-PVbl3YBdTJDCx89R
 
 **Prerequisites:**  Node.js
 
+# Culinary AI
 
+Live Configured Domain: [https://luminereculinary.com](https://luminereculinary.com)
+Live Vercel Url: [https://culinary-ai-mygu.vercel.app](https://culinary-ai-mygu.vercel.app)
 1. Install dependencies:
    `npm install`
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
