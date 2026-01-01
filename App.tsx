@@ -5,6 +5,7 @@ import LiveChefAssistant from './components/LiveChefAssistant';
 import ImageWithLoader from './components/ImageWithLoader';
 import { AuthModal } from './components/AuthModal';
 import { SavedRecipes } from './components/SavedRecipes';
+import { RecipeCard } from './components/RecipeCard';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './services/supabaseClient';
 import { CuisineType, RecipeTag, RecipeSummary, RecipeDetail, GenerationState, ImageSize } from './types';
@@ -347,31 +348,12 @@ const App: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {recipes.map((recipe, idx) => (
-            <div
+            <RecipeCard
               key={idx}
-              onClick={() => handleSelectRecipe(recipe)}
-              className="group cursor-pointer bg-black/70 backdrop-blur-md border border-gray-700 hover:border-culinary-gold/70 transition-all duration-300 flex flex-col md:flex-row overflow-hidden shadow-2xl"
-            >
-              <div className="md:w-2/5 h-48 md:h-auto overflow-hidden relative">
-                <ImageWithLoader
-                  src={getDishImageUrl(recipe.name, selectedCuisine, 400, 600)}
-                  alt={recipe.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                  containerClassName="w-full h-full"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent md:bg-gradient-to-r"></div>
-              </div>
-              <div className="p-6 md:w-3/5 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-2xl font-serif text-culinary-cream mb-2 group-hover:text-culinary-gold transition-colors">{recipe.name}</h3>
-                  <p className="text-gray-300 font-sans text-sm line-clamp-2 mb-4">{recipe.description}</p>
-                </div>
-                <div className="flex items-center space-x-4 text-xs text-gray-400 font-sans uppercase tracking-widest border-t border-gray-600 pt-4">
-                  <span className="flex items-center"><Clock className="w-3 h-3 mr-1" /> {recipe.prepTime}</span>
-                  <span className="flex items-center"><BarChart2 className="w-3 h-3 mr-1" /> {recipe.difficulty}</span>
-                </div>
-              </div>
-            </div>
+              recipe={recipe}
+              selectedCuisine={selectedCuisine}
+              onClick={handleSelectRecipe}
+            />
           ))}
         </div>
       )}
