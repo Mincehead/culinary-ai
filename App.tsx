@@ -8,9 +8,9 @@ import { SavedRecipes } from './components/SavedRecipes';
 import { RecipeCard } from './components/RecipeCard';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './services/supabaseClient';
-import { CuisineType, RecipeTag, RecipeSummary, RecipeDetail, GenerationState, ImageSize } from './types';
+import { CuisineType, RecipeTag, RecipeSummary, RecipeDetail, GenerationState, ImageSize, DietaryRequirement } from './types';
 import { generateRecipeList, generateRecipeDetail, generateImage } from './services/geminiService';
-import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut, Wheat, Check } from 'lucide-react';
 
 enum ViewState {
   HOME,
@@ -25,6 +25,7 @@ const App: React.FC = () => {
   // Selection State
   const [selectedCuisine, setSelectedCuisine] = useState<CuisineType | null>(null);
   const [selectedTag, setSelectedTag] = useState<RecipeTag | null>(null);
+  const [selectedDietary, setSelectedDietary] = useState<DietaryRequirement[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedRecipeSummary, setSelectedRecipeSummary] = useState<RecipeSummary | null>(null);
 
@@ -154,7 +155,7 @@ const App: React.FC = () => {
     setSelectedTag(null);
 
     try {
-      const result = await generateRecipeList(null, null, searchQuery);
+      const result = await generateRecipeList(null, null, selectedDietary, searchQuery);
       setRecipes(result);
     } catch (err) {
       setError("The AI Chef is busy. Please try again.");
@@ -174,7 +175,7 @@ const App: React.FC = () => {
     setView(ViewState.RECIPE_LIST);
 
     try {
-      const result = await generateRecipeList(selectedCuisine, tag);
+      const result = await generateRecipeList(selectedCuisine, tag, selectedDietary);
       setRecipes(result);
     } catch (err) {
       setError("The AI Chef is currently busy. Please try again.");
@@ -192,7 +193,7 @@ const App: React.FC = () => {
       if (searchQuery) {
         newRecipes = await generateRecipeList(null, null, searchQuery);
       } else if (selectedCuisine && selectedTag) {
-        newRecipes = await generateRecipeList(selectedCuisine, selectedTag);
+        newRecipes = await generateRecipeList(selectedCuisine, selectedTag, selectedDietary);
       }
 
       // Filter out duplicates based on name
@@ -218,7 +219,7 @@ const App: React.FC = () => {
     setGeneratedInfographic(null);
 
     try {
-      const detail = await generateRecipeDetail(summary.name, selectedCuisine);
+      const detail = await generateRecipeDetail(summary.name, selectedCuisine, selectedDietary);
       setRecipeDetail(detail);
       // Only switch view if data retrieval is successful
       setView(ViewState.RECIPE_DETAIL);
@@ -299,7 +300,38 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* Step 2: Tag Selection (Only visible if cuisine selected) */}
+
+
+      {/* Step 2: Dietary Preferences (Optional) */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-serif text-culinary-cream mb-6 border-b border-gray-400/30 pb-2 flex items-center gap-2 drop-shadow-md">
+          <Wheat className="w-5 h-5 text-culinary-gold" /> Dietary Preferences <span className="text-gray-500 text-sm font-sans ml-2 normal-case tracking-normal">(Optional)</span>
+        </h2>
+        <div className="flex flex-wrap gap-3">
+          {Object.values(DietaryRequirement).map((diet) => {
+            const isSelected = selectedDietary.includes(diet);
+            return (
+              <button
+                key={diet}
+                onClick={() => {
+                  setSelectedDietary(prev =>
+                    isSelected ? prev.filter(d => d !== diet) : [...prev, diet]
+                  );
+                }}
+                className={`px-4 py-2 rounded-full border transition-all duration-300 font-sans text-sm flex items-center gap-2 ${isSelected
+                  ? 'bg-culinary-gold text-culinary-dark border-culinary-gold shadow-[0_0_10px_rgba(212,175,55,0.4)]'
+                  : 'bg-black/40 text-gray-300 border-gray-600 hover:border-culinary-gold hover:text-culinary-gold'
+                  }`}
+              >
+                {isSelected && <Check className="w-3 h-3" />}
+                {diet}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Step 3: Tag Selection (Only visible if cuisine selected) */}
       <section className={`transition-all duration-700 ${selectedCuisine ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
         <h2 className="text-2xl font-serif text-culinary-cream mb-6 border-b border-gray-400/30 pb-2 flex items-center gap-2 drop-shadow-md">
           <Flame className="w-5 h-5 text-culinary-gold" /> Select Style

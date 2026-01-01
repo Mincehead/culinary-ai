@@ -18,16 +18,19 @@ const IMAGE_MODEL_NAME = "gemini-3-pro-image-preview";
 export const generateRecipeList = async (
   cuisine: CuisineType | null,
   tag: RecipeTag | null,
+  dietary: string[] = [],
   searchQuery?: string
 ): Promise<RecipeSummary[]> => {
   const ai = getAiClient();
 
+  const dietaryContext = dietary.length > 0 ? ` that are strictly ${dietary.join(" and ")}` : "";
+
   let prompt = "";
   if (searchQuery) {
-    prompt = `Generate a list of 4 distinct and popular recipes that match the search query "${searchQuery}". 
+    prompt = `Generate a list of 4 distinct and popular recipes${dietaryContext} that match the search query "${searchQuery}". 
     If the query implies a specific cuisine, focus on that.`;
   } else {
-    prompt = `Generate a list of 4 distinct and popular ${cuisine} recipes that fit the category "${tag}".`;
+    prompt = `Generate a list of 4 distinct and popular ${cuisine} recipes${dietaryContext} that fit the category "${tag}".`;
   }
 
   prompt += ` Provide a short description, prep time, difficulty level, and a single keyword to search for an image.`;
@@ -69,12 +72,14 @@ export const generateRecipeList = async (
 
 export const generateRecipeDetail = async (
   recipeName: string,
-  cuisine: CuisineType | null
+  cuisine: CuisineType | null,
+  dietary: string[] = []
 ): Promise<RecipeDetail> => {
   console.log(`[geminiService] generateRecipeDetail called for: ${recipeName}, cuisine: ${cuisine}`);
   const ai = getAiClient();
   const cuisineContext = cuisine ? `(${cuisine} cuisine)` : '';
-  const prompt = `Provide a detailed cooking guide for "${recipeName}" ${cuisineContext}. 
+  const dietaryContext = dietary.length > 0 ? `(Strictly ${dietary.join(", ")})` : "";
+  const prompt = `Provide a detailed cooking guide for "${recipeName}" ${cuisineContext} ${dietaryContext}. 
   Include a brief history or cultural significance, a list of ingredients with measurements, step-by-step instructions, and specific chef's tips for the best result.`;
 
   const schema: Schema = {

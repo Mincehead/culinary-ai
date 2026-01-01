@@ -21,6 +21,19 @@ export enum RecipeTag {
   HEALTHY = 'Healthy'
 }
 
+export enum DietaryRequirement {
+  GLUTEN_FREE = 'Gluten-Free',
+  DAIRY_FREE = 'Dairy-Free',
+  NUT_FREE = 'Nut-Free',
+  VEGAN = 'Vegan',
+  VEGETARIAN = 'Vegetarian',
+  KETO = 'Keto',
+  PALEO = 'Paleo',
+  LOW_CARB = 'Low-Carb',
+  HALAL = 'Halal',
+  KOSHER = 'Kosher'
+}
+
 export interface RecipeSummary {
   name: string;
   description: string;
