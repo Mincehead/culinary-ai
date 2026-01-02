@@ -22,10 +22,13 @@ export const SavedRecipes: React.FC<SavedRecipesProps> = ({ onSelectRecipe }) =>
 
     const fetchSavedRecipes = async () => {
         try {
+            console.log("Fetching recipes for user:", user?.id);
             const { data, error } = await supabase
                 .from('saved_recipes')
                 .select('*')
                 .order('created_at', { ascending: false });
+
+            console.log("Supabase response:", { data, error });
 
             if (error) throw error;
             setRecipes(data || []);
