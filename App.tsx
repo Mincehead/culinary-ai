@@ -11,6 +11,7 @@ import { supabase } from './services/supabaseClient';
 import { CuisineType, RecipeTag, RecipeSummary, RecipeDetail, GenerationState, ImageSize, DietaryRequirement } from './types';
 import { generateRecipeList, generateRecipeDetail, generateImage } from './services/geminiService';
 import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut, Wheat, Check } from 'lucide-react';
+import { DebugLog } from './components/DebugLog';
 
 enum ViewState {
   HOME,
@@ -598,6 +599,7 @@ const App: React.FC = () => {
     <div className="relative min-h-screen text-gray-200 selection:bg-culinary-gold selection:text-black">
       {/* Background sits at z-0 */}
       <Background />
+      <DebugLog />
 
       {/* Content sits at z-10 */}
       <div className="relative z-10">
