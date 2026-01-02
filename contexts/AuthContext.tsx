@@ -22,6 +22,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("[AuthContext] getSession:", session);
             setSession(session);
             setUser(session?.user ?? null);
+
+            // If there is a hash with an access token, allow onAuthStateChange to handle the loading state
+            // This prevents a premature "Logged Out" flash on mobile while parsing the URL
+            if (!session && window.location.hash.includes('access_token')) {
+                console.log("[AuthContext] Hash detected, waiting for onAuthStateChange");
+                return;
+            }
+
             setLoading(false);
         });
 
