@@ -1,63 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lumière Culinary | AI Personal Chef & Bespoke Recipe Generator</title>
-    <meta name="description" content="Experience the future of cooking. Lumière uses advanced AI to craft personalized, Michelin-style recipes and visualize stunning dishes. Your digital personal chef awaits." />
-    <meta name="keywords" content="AI chef, recipe generator, gourmet cooking, food AI, personalized menu, bespoke recipes, Lumière Culinary, digital cookbook, gluten free recipes, vegan food generator" />
-    <meta name="author" content="Lumière Culinary" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://luminereculinary.com/" />
-    <meta property="og:title" content="Lumière Culinary | AI Personal Chef" />
-    <meta property="og:description" content="Generate bespoke, Michelin-star quality recipes with AI. Visualize your dish before you cook." />
-    <meta property="og:image" content="https://luminereculinary.com/og-image.jpg" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://luminereculinary.com/" />
-    <meta property="twitter:title" content="Lumière Culinary | AI Personal Chef" />
-    <meta property="twitter:description" content="Generate bespoke, Michelin-star quality recipes with AI. Visualize your dish before you cook." />
-    <meta property="twitter:image" content="https://luminereculinary.com/og-image.jpg" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              serif: ['"Playfair Display"', 'serif'],
-              sans: ['"Lato"', 'sans-serif'],
-            },
-            colors: {
-              culinary: {
-                dark: '#1a1a1a',
-                gold: '#d4af37',
-                cream: '#f5f5dc',
-                sage: '#8a9a5b',
-                rustic: '#8b4513'
-              }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumière Culinary | AI Personal Chef & Bespoke Recipe Generator</title>
+  <meta name="description"
+    content="Experience the future of cooking. Lumière uses advanced AI to craft personalized, Michelin-style recipes and visualize stunning dishes. Your digital personal chef awaits." />
+  <meta name="keywords"
+    content="AI chef, recipe generator, gourmet cooking, food AI, personalized menu, bespoke recipes, Lumière Culinary, digital cookbook, gluten free recipes, vegan food generator" />
+  <meta name="author" content="Lumière Culinary" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://luminereculinary.com/" />
+  <meta property="og:title" content="Lumière Culinary | AI Personal Chef" />
+  <meta property="og:description"
+    content="Generate bespoke, Michelin-star quality recipes with AI. Visualize your dish before you cook." />
+  <meta property="og:image" content="https://luminereculinary.com/og-image.jpg" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://luminereculinary.com/" />
+  <meta property="twitter:title" content="Lumière Culinary | AI Personal Chef" />
+  <meta property="twitter:description"
+    content="Generate bespoke, Michelin-star quality recipes with AI. Visualize your dish before you cook." />
+  <meta property="twitter:image" content="https://luminereculinary.com/og-image.jpg" />
+  <meta name="google-site-verification" content="google61b0ea01eba197d7" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['"Lato"', 'sans-serif'],
+          },
+          colors: {
+            culinary: {
+              dark: '#1a1a1a',
+              gold: '#d4af37',
+              cream: '#f5f5dc',
+              sage: '#8a9a5b',
+              rustic: '#8b4513'
             }
           }
         }
       }
-    </script>
-    <style>
-      body {
-        background-color: #1a1a1a;
-        color: #f5f5dc;
-      }
-      .cinematic-shadow {
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
-      }
-      .text-shadow {
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-      }
-    </style>
+    }
+  </script>
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #f5f5dc;
+    }
+
+    .cinematic-shadow {
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+
+    .text-shadow {
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -69,10 +79,12 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
-  <body>
-    <div id="root"></div>
+
+<body>
+  <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>
