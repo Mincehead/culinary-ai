@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
                         <span className="text-2xl font-serif font-bold tracking-tight">LUMIÈRE</span>
                     </div>
                     <p className="text-gray-400 font-sans text-sm leading-relaxed max-w-xs">
-                        Elevating home cooking with the power of Artificial Intelligence. Experience bespoke culinary creations tailored to your taste.
+                        We built Lumière to be the ultimate recipe book—containing every recipe in the world, powered by AI. From Hunter Valley to your kitchen, we're redefining what's possible in home cooking.
                     </p>
                     <div className="flex gap-4">
                         <a href="#" className="text-gray-500 hover:text-culinary-gold transition-colors"><Instagram className="w-5 h-5" /></a>
@@ -38,8 +38,6 @@ export const Footer: React.FC = () => {
                     <h3 className="text-culinary-cream font-serif text-lg mb-6">Company</h3>
                     <ul className="space-y-4 text-sm font-sans text-gray-400">
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">About Us</a></li>
-                        <li><a href="#" className="hover:text-culinary-gold transition-colors">Sustainability</a></li>
-                        <li><a href="#" className="hover:text-culinary-gold transition-colors">Carrers</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Press & Media</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Contact Us</a></li>
                     </ul>
@@ -51,15 +49,15 @@ export const Footer: React.FC = () => {
                     <ul className="space-y-4 text-sm font-sans text-gray-400">
                         <li className="flex items-start gap-3">
                             <MapPin className="w-5 h-5 text-culinary-gold shrink-0" />
-                            <span>123 Culinary Ave,<br />New York, NY 10012</span>
+                            <span>Hunter Valley,<br />NSW, Australia</span>
                         </li>
                         <li className="flex items-center gap-3">
                             <Phone className="w-5 h-5 text-culinary-gold shrink-0" />
-                            <span>+1 (555) 123-4567</span>
+                            <span>0435 203 036</span>
                         </li>
                         <li className="flex items-center gap-3">
                             <Mail className="w-5 h-5 text-culinary-gold shrink-0" />
-                            <span>concierge@lumiere.ai</span>
+                            <span>luminereculinary@gmail.com</span>
                         </li>
                     </ul>
                 </div>
