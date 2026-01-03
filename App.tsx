@@ -11,6 +11,7 @@ import { supabase } from './services/supabaseClient';
 import { CuisineType, RecipeTag, RecipeSummary, RecipeDetail, GenerationState, ImageSize, DietaryRequirement } from './types';
 import { generateRecipeList, generateRecipeDetail, generateImage } from './services/geminiService';
 import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut, Wheat, Check } from 'lucide-react';
+import { Footer } from './components/Footer';
 
 enum ViewState {
   HOME,
@@ -655,11 +656,8 @@ const App: React.FC = () => {
             }} />
           </div>
         )}
+        <Footer />
       </div>
-
-      <footer className="fixed bottom-4 right-6 text-xs text-gray-400 font-sans tracking-widest pointer-events-none z-50 drop-shadow-md">
-        AI CULINARY ENGINE v2.6.2 - Mobile Fix
-      </footer>
     </div>
   );
 };
