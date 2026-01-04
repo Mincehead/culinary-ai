@@ -25,8 +25,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             // If there is a hash with an access token, allow onAuthStateChange to handle the loading state
             // This prevents a premature "Logged Out" flash on mobile while parsing the URL
-            if (!session && window.location.hash.includes('access_token')) {
-                console.log("[AuthContext] Hash detected, waiting for onAuthStateChange");
+            // Check for both implicit (hash) and PKCE (search code) flows
+            const hasAuthParams = window.location.hash.includes('access_token') ||
+                window.location.search.includes('code=');
+
+            if (!session && hasAuthParams) {
+                console.log("[AuthContext] Auth params detected, waiting for onAuthStateChange");
                 return;
             }
 
