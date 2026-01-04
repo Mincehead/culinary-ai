@@ -119,10 +119,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <button
                     onClick={async () => {
                         try {
+                            const origin = window.location.origin;
+                            console.log("Attempting OAuth with redirect to:", origin);
+                            // alert("Starting Google Auth... Redirect to: " + origin); // Uncomment if needed for extreme debugging
+
                             const { error } = await supabase.auth.signInWithOAuth({
                                 provider: 'google',
                                 options: {
-                                    redirectTo: window.location.origin,
+                                    redirectTo: origin,
                                     queryParams: {
                                         access_type: 'offline',
                                         prompt: 'consent',
@@ -131,6 +135,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                             });
                             if (error) throw error;
                         } catch (err: any) {
+                            console.error("OAuth Error:", err);
+                            alert("Auth Error: " + err.message);
                             setError(err.message);
                         }
                     }}
