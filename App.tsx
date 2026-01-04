@@ -12,6 +12,7 @@ import { CuisineType, RecipeTag, RecipeSummary, RecipeDetail, GenerationState, I
 import { generateRecipeList, generateRecipeDetail, generateImage } from './services/geminiService';
 import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut, Wheat, Check } from 'lucide-react';
 import { Footer } from './components/Footer';
+import { ReviewsSection } from './components/ReviewsSection';
 
 enum ViewState {
   HOME,
