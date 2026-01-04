@@ -306,7 +306,7 @@ const App: React.FC = () => {
 
 
       {/* Step 2: Dietary Preferences (Optional) */}
-      <section className="mb-12">
+      <section className="mb-6 md:mb-12">
         <h2 className="text-2xl font-serif text-culinary-cream mb-6 border-b border-gray-400/30 pb-2 flex items-center gap-2 drop-shadow-md">
           <Wheat className="w-5 h-5 text-culinary-gold" /> Dietary Preferences <span className="text-gray-500 text-sm font-sans ml-2 normal-case tracking-normal">(Optional)</span>
         </h2>
@@ -335,7 +335,7 @@ const App: React.FC = () => {
       </section>
 
       {/* Step 3: Tag Selection (Only visible if cuisine selected) */}
-      <section className={`transition-all duration-700 ${selectedCuisine ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+      <section className={`transition-all duration-700 ${selectedCuisine ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none h-0 overflow-hidden'}`}>
         <h2 className="text-2xl font-serif text-culinary-cream mb-6 border-b border-gray-400/30 pb-2 flex items-center gap-2 drop-shadow-md">
           <Flame className="w-5 h-5 text-culinary-gold" /> Select Style
         </h2>
