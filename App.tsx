@@ -13,6 +13,7 @@ import { generateRecipeList, generateRecipeDetail, generateImage } from './servi
 import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut, Wheat, Check } from 'lucide-react';
 import { Footer } from './components/Footer';
 import { ReviewsSection } from './components/ReviewsSection';
+import { ReviewsSection } from './components/ReviewsSection';
 
 enum ViewState {
   HOME,
@@ -353,6 +354,9 @@ const App: React.FC = () => {
           ))}
         </div>
       </section>
+
+      {/* Reviews Section */}
+      <ReviewsSection />
     </div >
   );
 
