@@ -625,10 +625,11 @@ const App: React.FC = () => {
               </button>
               <button
                 onClick={() => signOut()}
-                className="text-gray-500 hover:text-red-400 p-2"
+                className="flex items-center gap-2 px-3 py-2 text-white hover:text-red-400 transition-colors bg-black/30 rounded-full border border-white/10"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
+                <span className="text-xs uppercase tracking-widest">Sign Out</span>
               </button>
             </div>
           ) : (
