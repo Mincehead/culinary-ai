@@ -13,6 +13,7 @@ import { generateRecipeList, generateRecipeDetail, generateImage } from './servi
 import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut, Wheat, Check } from 'lucide-react';
 import { Footer } from './components/Footer';
 import { ReviewsSection } from './components/ReviewsSection';
+import { DebugAuth } from './components/DebugAuth';
 import { ReviewsSection } from './components/ReviewsSection';
 
 enum ViewState {
@@ -667,4 +668,22 @@ const App: React.FC = () => {
   );
 };
 
+// The new App component structure as requested
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom'; // Assuming react-router-dom is used
+import { AuthProvider } from './AuthContext'; // Assuming an AuthProvider exists
+import DebugAuth from './DebugAuth'; // Assuming DebugAuth component exists
+
+const App = () => {
+  return (
+    <Router>
+      <AuthProvider>
+        <DebugAuth />
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+};
+
 export default App;
+```
