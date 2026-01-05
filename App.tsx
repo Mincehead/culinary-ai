@@ -14,7 +14,7 @@ import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Gl
 import { Footer } from './components/Footer';
 import { ReviewsSection } from './components/ReviewsSection';
 import { DebugAuth } from './components/DebugAuth';
-import { ReviewsSection } from './components/ReviewsSection';
+
 
 enum ViewState {
   HOME,
@@ -603,6 +603,7 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen text-gray-200 selection:bg-culinary-gold selection:text-black">
+      <DebugAuth />
       {/* Background sits at z-0 */}
       <Background />
 
@@ -667,23 +668,3 @@ const App: React.FC = () => {
     </div>
   );
 };
-
-// The new App component structure as requested
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom'; // Assuming react-router-dom is used
-import { AuthProvider } from './AuthContext'; // Assuming an AuthProvider exists
-import DebugAuth from './DebugAuth'; // Assuming DebugAuth component exists
-
-const App = () => {
-  return (
-    <Router>
-      <AuthProvider>
-        <DebugAuth />
-        <AppContent />
-      </AuthProvider>
-    </Router>
-  );
-};
-
-export default App;
-```
