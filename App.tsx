@@ -13,7 +13,7 @@ import { generateRecipeList, generateRecipeDetail, generateImage } from './servi
 import { ChevronRight, ArrowLeft, Clock, BarChart2, ChefHat, BookOpen, Flame, Globe, Camera, Image as ImageIcon, Settings, Wand2, Search, Plus, User, Heart, LogOut, Wheat, Check } from 'lucide-react';
 import { Footer } from './components/Footer';
 import { ReviewsSection } from './components/ReviewsSection';
-import { DebugAuth } from './components/DebugAuth';
+
 
 
 enum ViewState {
@@ -603,7 +603,6 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen text-gray-200 selection:bg-culinary-gold selection:text-black">
-      <DebugAuth />
       {/* Background sits at z-0 */}
       <Background />
 
