@@ -29,7 +29,7 @@ export const Footer: React.FC = () => {
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Seasonal Menu</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Personal Chef</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Culinary Styles</a></li>
-                        <li><a href="#" className="hover:text-culinary-gold transition-colors">Gift Cards</a></li>
+
                     </ul>
                 </div>
 
@@ -51,10 +51,7 @@ export const Footer: React.FC = () => {
                             <MapPin className="w-5 h-5 text-culinary-gold shrink-0" />
                             <span>Hunter Valley,<br />NSW, Australia</span>
                         </li>
-                        <li className="flex items-center gap-3">
-                            <Phone className="w-5 h-5 text-culinary-gold shrink-0" />
-                            <span>0435 203 036</span>
-                        </li>
+
                         <li className="flex items-center gap-3">
                             <Mail className="w-5 h-5 text-culinary-gold shrink-0" />
                             <span>lumiereculinary@gmail.com</span>
