@@ -7,7 +7,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { CuisineType, RecipeTag, DietaryRequirement } from '../types';
 import { ChevronRight, Search, Globe, Wheat, Flame, Check, User, LogOut } from 'lucide-react';
 import { ReviewsSection } from '../components/ReviewsSection';
-import { LumiereLogo } from '../components/LumiereLogo';
 
 export const LandingPage: React.FC = () => {
     const navigate = useNavigate();
@@ -77,13 +76,7 @@ export const LandingPage: React.FC = () => {
                     )}
                 </div>
 
-                {/* Logo Section */}
-                <div className="absolute top-6 left-6 z-50">
-                    <LumiereLogo
-                        className="w-16 h-16 md:w-20 md:h-20 drop-shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer text-culinary-gold"
-                        onClick={() => navigate('/')}
-                    />
-                </div>
+
 
                 <AuthModal
                     isOpen={isAuthModalOpen}
