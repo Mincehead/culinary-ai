@@ -4,8 +4,8 @@ import { LandingPage } from './components/LandingPage';
 import { RecipeList } from './components/RecipeList';
 import { RecipeDetail } from './components/RecipeDetail';
 import { Profile } from './components/Profile';
-import { PrivacyPolicy } from './components/PrivacyPolicy';
-import { TermsOfService } from './components/TermsOfService';
+import { PrivacyPolicy } from './pages/Privacy';
+import { TermsOfService } from './pages/Terms';
 import { ScrollToTop } from './components/ScrollToTop';
 
 const App: React.FC = () => {

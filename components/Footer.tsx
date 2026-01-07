@@ -39,8 +39,8 @@ export const Footer: React.FC = () => {
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">About Us</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Press & Media</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Contact Us</a></li>
-                        <li><Link to="/privacy" className="hover:text-culinary-gold transition-colors text-left w-full block">Privacy Policy</Link></li>
-                        <li><Link to="/terms" className="hover:text-culinary-gold transition-colors text-left w-full block">Terms of Service</Link></li>
+                        <li><a href="/privacy" className="hover:text-culinary-gold transition-colors text-left w-full block">Privacy Policy</a></li>
+                        <li><a href="/terms" className="hover:text-culinary-gold transition-colors text-left w-full block">Terms of Service</a></li>
                     </ul>
                 </div>
 
@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
             <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-sans tracking-widest uppercase">
                 <div>&copy; 2025 Lumière Culinary. All rights reserved.</div>
                 <div className="flex gap-8">
-                    <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                    <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
                 </div>
             </div>
         </footer>

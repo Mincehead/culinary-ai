@@ -1,6 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../services/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
     user: User | null;
@@ -15,6 +13,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Check active session
@@ -26,7 +25,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // AGGRESSIVE URL CLEANUP:
             // Check immediately if we have a hash to clear, even before onAuthStateChange
             if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery'))) {
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                console.log("[AuthContext] Cleaning hash...");
+                // Use navigate with replace: true to clean URL and sync router state
+                navigate(window.location.pathname + window.location.search, { replace: true });
             }
 
             // If there is a hash with an access token, allow onAuthStateChange to handle the loading state
@@ -53,17 +54,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             // Clean up the URL hash if it contains auth info
             if (event === 'SIGNED_IN' && (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery'))) {
-                // Use replaceState to clear the hash without triggering a navigation/reload
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                navigate(window.location.pathname + window.location.search, { replace: true });
             }
         });
 
         return () => subscription.unsubscribe();
-    }, []);
+    }, [navigate]);
 
     const signOut = async () => {
         await supabase.auth.signOut();
-        window.location.reload();
+        navigate('/'); // Redirect to home first
+        window.location.reload(); // Then reload to clear state cleanly
     };
 
     return (
