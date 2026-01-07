@@ -43,6 +43,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Press & Media</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Contact Us</a></li>
                         <li><button onClick={() => onNavigate?.('privacy')} className="hover:text-culinary-gold transition-colors text-left w-full">Privacy Policy</button></li>
+                        <li><button onClick={() => onNavigate?.('terms')} className="hover:text-culinary-gold transition-colors text-left w-full">Terms of Service</button></li>
                     </ul>
                 </div>
 
@@ -68,7 +69,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <div>&copy; 2025 Lumière Culinary. All rights reserved.</div>
                 <div className="flex gap-8">
                     <button onClick={() => onNavigate?.('privacy')} className="hover:text-white transition-colors">Privacy Policy</button>
-                    <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+
                 </div>
             </div>
         </footer>

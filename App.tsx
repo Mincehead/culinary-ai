@@ -6,6 +6,7 @@ import ImageWithLoader from './components/ImageWithLoader';
 import { AuthModal } from './components/AuthModal';
 import { SavedRecipes } from './components/SavedRecipes';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
 import { RecipeCard } from './components/RecipeCard';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './services/supabaseClient';
@@ -22,7 +23,8 @@ enum ViewState {
   RECIPE_LIST,
   RECIPE_DETAIL,
   PROFILE,
-  PRIVACY
+  PRIVACY,
+  TERMS
 }
 
 const App: React.FC = () => {
@@ -668,8 +670,12 @@ const App: React.FC = () => {
         {view === ViewState.PRIVACY && (
           <PrivacyPolicy onBack={() => setView(ViewState.HOME)} />
         )}
-        {view !== ViewState.PRIVACY && <Footer onNavigate={(page) => {
+        {view === ViewState.TERMS && (
+          <TermsOfService onBack={() => setView(ViewState.HOME)} />
+        )}
+        {view !== ViewState.PRIVACY && view !== ViewState.TERMS && <Footer onNavigate={(page) => {
           if (page === 'privacy') setView(ViewState.PRIVACY);
+          if (page === 'terms') setView(ViewState.TERMS);
         }} />}
       </div>
     </div>
