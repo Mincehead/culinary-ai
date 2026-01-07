@@ -2,9 +2,16 @@ import React from 'react';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { Helmet } from 'react-helmet-async';
+
 export const TermsOfService: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto px-6 py-12 text-gray-300 font-sans">
+            <Helmet>
+                <title>Terms of Service | Lumière Culinary</title>
+                <meta name="description" content="Terms of Service for Lumière Culinary." />
+                <link rel="canonical" href="https://lumiereculinary.com/terms" />
+            </Helmet>
             <Link
                 to="/"
                 className="flex items-center text-gray-400 hover:text-culinary-gold transition-colors mb-8 uppercase tracking-widest text-sm"

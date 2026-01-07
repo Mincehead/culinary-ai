@@ -1,26 +1,28 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { LandingPage } from './components/LandingPage';
-import { RecipeList } from './components/RecipeList';
-import { RecipeDetail } from './components/RecipeDetail';
-import { Profile } from './components/Profile';
+import { HelmetProvider } from 'react-helmet-async';
+import { MainLayout } from './layouts/MainLayout';
+import { LandingPage } from './pages/LandingPage';
+import { RecipeList } from './pages/RecipeList';
+import { RecipeDetail } from './pages/RecipeDetail';
+import { Profile } from './pages/Profile';
 import { PrivacyPolicy } from './pages/Privacy';
 import { TermsOfService } from './pages/Terms';
-import { ScrollToTop } from './components/ScrollToTop';
 
 const App: React.FC = () => {
   return (
-    <>
-      <ScrollToTop />
+    <HelmetProvider>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/recipes" element={<RecipeList />} />
-        <Route path="/recipe/preview" element={<RecipeDetail />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsOfService />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/recipes" element={<RecipeList />} />
+          <Route path="/recipe/preview" element={<RecipeDetail />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+        </Route>
       </Routes>
-    </>
+    </HelmetProvider>
   );
 };
 

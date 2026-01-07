@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import Background from './Background';
-import Loader from './Loader';
-import { RecipeCard } from './RecipeCard';
+import { Helmet } from 'react-helmet-async';
+import Background from '../components/Background';
+import Loader from '../components/Loader';
+import { RecipeCard } from '../components/RecipeCard';
 import { generateRecipeList } from '../services/geminiService';
 import { RecipeSummary, CuisineType, RecipeTag, DietaryRequirement } from '../types';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { Footer } from './Footer';
 
 export const RecipeList: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -104,6 +104,10 @@ export const RecipeList: React.FC = () => {
 
     return (
         <div className="relative min-h-screen text-gray-200 selection:bg-culinary-gold selection:text-black">
+            <Helmet>
+                <title>Recipe Results | Lumière Culinary</title>
+                <meta name="description" content="Browse your AI-generated bespoke recipes based on your unique culinary preferences." />
+            </Helmet>
             <Background />
             <div className="relative z-10 flex flex-col min-h-screen">
                 <div className="max-w-7xl mx-auto px-6 py-8 w-full flex-grow">
@@ -155,7 +159,6 @@ export const RecipeList: React.FC = () => {
                         </div>
                     )}
                 </div>
-                <Footer />
             </div>
         </div>
     );

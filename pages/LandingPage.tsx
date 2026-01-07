@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Background from './Background';
-import { AuthModal } from './AuthModal';
+import { Helmet } from 'react-helmet-async';
+import Background from '../components/Background';
+import { AuthModal } from '../components/AuthModal';
 import { useAuth } from '../contexts/AuthContext';
 import { CuisineType, RecipeTag, DietaryRequirement } from '../types';
 import { ChevronRight, Search, Globe, Wheat, Flame, Check, User, LogOut } from 'lucide-react';
-import { Footer } from './Footer';
-import { ReviewsSection } from './ReviewsSection';
+import { ReviewsSection } from '../components/ReviewsSection';
 
 export const LandingPage: React.FC = () => {
     const navigate = useNavigate();
@@ -37,6 +37,11 @@ export const LandingPage: React.FC = () => {
 
     return (
         <div className="relative min-h-screen text-gray-200 selection:bg-culinary-gold selection:text-black">
+            <Helmet>
+                <title>Lumière Culinary | AI Personal Chef & Bespoke Recipe Generator</title>
+                <meta name="description" content="Draft bespoke, Michelin-style recipes instantly with AI. Select your cuisine, style, and dietary needs." />
+                <link rel="canonical" href="https://lumiereculinary.com/" />
+            </Helmet>
             <Background />
 
             <div className="relative z-10">
@@ -184,7 +189,6 @@ export const LandingPage: React.FC = () => {
 
                     <ReviewsSection />
                 </div>
-                <Footer />
             </div>
         </div>
     );

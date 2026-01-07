@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Loader from './Loader';
-import LiveChefAssistant from './LiveChefAssistant';
-import ImageWithLoader from './ImageWithLoader';
-import { AuthModal } from './AuthModal';
+import { Helmet } from 'react-helmet-async';
+import Loader from '../components/Loader';
+import LiveChefAssistant from '../components/LiveChefAssistant';
+import ImageWithLoader from '../components/ImageWithLoader';
+import { AuthModal } from '../components/AuthModal';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabaseClient';
 import { generateRecipeDetail, generateImage } from '../services/geminiService';
@@ -159,6 +160,10 @@ export const RecipeDetail: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto bg-culinary-dark/95 min-h-screen shadow-2xl relative border-x border-gray-800 text-gray-200 selection:bg-culinary-gold selection:text-black">
+            <Helmet>
+                <title>{detail.name} | Lumière Culinary</title>
+                <meta name="description" content={`AI-generated recipe for ${detail.name}. ${detail.flavorProfile}`} />
+            </Helmet>
 
             <AuthModal
                 isOpen={isAuthModalOpen}

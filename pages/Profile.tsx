@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SavedRecipes } from './SavedRecipes';
-import Background from './Background';
+import { Helmet } from 'react-helmet-async';
+import { SavedRecipes } from '../components/SavedRecipes';
+import Background from '../components/Background';
 import { ArrowLeft } from 'lucide-react';
 import { RecipeDetail } from '../types';
 
@@ -32,6 +33,10 @@ export const Profile: React.FC = () => {
 
     return (
         <div className="relative min-h-screen text-gray-200 selection:bg-culinary-gold selection:text-black">
+            <Helmet>
+                <title>My Menu | Lumière Culinary</title>
+                <meta name="description" content="Your saved recipes and personalized menu." />
+            </Helmet>
             <Background />
             <div className="relative z-10">
                 <button
