@@ -80,7 +80,8 @@ export const generateRecipeDetail = async (
   const cuisineContext = cuisine ? `(${cuisine} cuisine)` : '';
   const dietaryContext = dietary.length > 0 ? `(Strictly ${dietary.join(", ")})` : "";
   const prompt = `Provide a detailed cooking guide for "${recipeName}" ${cuisineContext} ${dietaryContext}. 
-  Include a brief history or cultural significance, a list of ingredients with measurements, step-by-step instructions, and specific chef's tips for the best result.`;
+  Include a brief history or cultural significance, a list of ingredients with measurements, step-by-step instructions, and specific chef's tips for the best result.
+  IMPORTANT: All cooking temperatures must be provided in both Fahrenheit and Celsius (e.g. 350°F / 175°C).`;
 
   const schema: Schema = {
     type: Type.OBJECT,

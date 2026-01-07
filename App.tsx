@@ -5,6 +5,7 @@ import LiveChefAssistant from './components/LiveChefAssistant';
 import ImageWithLoader from './components/ImageWithLoader';
 import { AuthModal } from './components/AuthModal';
 import { SavedRecipes } from './components/SavedRecipes';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { RecipeCard } from './components/RecipeCard';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './services/supabaseClient';
@@ -20,7 +21,8 @@ enum ViewState {
   HOME,
   RECIPE_LIST,
   RECIPE_DETAIL,
-  PROFILE
+  PROFILE,
+  PRIVACY
 }
 
 const App: React.FC = () => {
@@ -663,7 +665,12 @@ const App: React.FC = () => {
             }} />
           </div>
         )}
-        <Footer />
+        {view === ViewState.PRIVACY && (
+          <PrivacyPolicy onBack={() => setView(ViewState.HOME)} />
+        )}
+        {view !== ViewState.PRIVACY && <Footer onNavigate={(page) => {
+          if (page === 'privacy') setView(ViewState.PRIVACY);
+        }} />}
       </div>
     </div>
   );

@@ -1,11 +1,14 @@
 import React from 'react';
 import { ChefHat, Mail, MapPin, Phone, Instagram, Twitter, Facebook } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+    onNavigate?: (page: string) => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     return (
         <footer className="relative z-10 bg-black/90 border-t border-gray-800 pt-20 pb-10 mt-20 backdrop-blur-md">
             <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-
                 {/* Brand Section */}
                 <div className="space-y-6">
                     <div className="flex items-center gap-2 text-culinary-gold">
@@ -29,7 +32,6 @@ export const Footer: React.FC = () => {
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Seasonal Menu</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Personal Chef</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Culinary Styles</a></li>
-
                     </ul>
                 </div>
 
@@ -64,7 +66,7 @@ export const Footer: React.FC = () => {
             <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-sans tracking-widest uppercase">
                 <div>&copy; 2025 Lumière Culinary. All rights reserved.</div>
                 <div className="flex gap-8">
-                    <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                    <button onClick={() => onNavigate?.('privacy')} className="hover:text-white transition-colors">Privacy Policy</button>
                     <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
                 </div>
             </div>
