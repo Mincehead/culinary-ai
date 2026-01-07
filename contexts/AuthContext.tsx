@@ -23,6 +23,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setSession(session);
             setUser(session?.user ?? null);
 
+            // AGGRESSIVE URL CLEANUP:
+            // Check immediately if we have a hash to clear, even before onAuthStateChange
+            if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery'))) {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
+
             // If there is a hash with an access token, allow onAuthStateChange to handle the loading state
             // This prevents a premature "Logged Out" flash on mobile while parsing the URL
             // Check for both implicit (hash) and PKCE (search code) flows
