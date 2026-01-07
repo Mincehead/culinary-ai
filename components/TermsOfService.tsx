@@ -1,19 +1,16 @@
 import React from 'react';
 import { ArrowLeft, FileText } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-interface TermsOfServiceProps {
-    onBack: () => void;
-}
-
-export const TermsOfService: React.FC<TermsOfServiceProps> = ({ onBack }) => {
+export const TermsOfService: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto px-6 py-12 text-gray-300 font-sans">
-            <button
-                onClick={onBack}
+            <Link
+                to="/"
                 className="flex items-center text-gray-400 hover:text-culinary-gold transition-colors mb-8 uppercase tracking-widest text-sm"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
-            </button>
+            </Link>
 
             <header className="mb-12 border-b border-gray-800 pb-8">
                 <div className="flex items-center gap-3 mb-4 text-culinary-gold">

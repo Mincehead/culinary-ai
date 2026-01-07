@@ -1,11 +1,8 @@
 import React from 'react';
-import { ChefHat, Mail, MapPin, Phone, Instagram, Twitter, Facebook } from 'lucide-react';
+import { ChefHat, Mail, MapPin, Instagram, Twitter, Facebook } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-interface FooterProps {
-    onNavigate?: (page: string) => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC = () => {
     return (
         <footer className="relative z-10 bg-black/90 border-t border-gray-800 pt-20 pb-10 mt-20 backdrop-blur-md">
             <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
@@ -42,8 +39,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">About Us</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Press & Media</a></li>
                         <li><a href="#" className="hover:text-culinary-gold transition-colors">Contact Us</a></li>
-                        <li><button onClick={() => onNavigate?.('privacy')} className="hover:text-culinary-gold transition-colors text-left w-full">Privacy Policy</button></li>
-                        <li><button onClick={() => onNavigate?.('terms')} className="hover:text-culinary-gold transition-colors text-left w-full">Terms of Service</button></li>
+                        <li><Link to="/privacy" className="hover:text-culinary-gold transition-colors text-left w-full block">Privacy Policy</Link></li>
+                        <li><Link to="/terms" className="hover:text-culinary-gold transition-colors text-left w-full block">Terms of Service</Link></li>
                     </ul>
                 </div>
 
@@ -68,8 +65,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-sans tracking-widest uppercase">
                 <div>&copy; 2025 Lumière Culinary. All rights reserved.</div>
                 <div className="flex gap-8">
-                    <button onClick={() => onNavigate?.('privacy')} className="hover:text-white transition-colors">Privacy Policy</button>
-
+                    <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
                 </div>
             </div>
         </footer>

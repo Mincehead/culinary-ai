@@ -44,6 +44,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
+
+            // Clean up the URL hash if it contains auth info
+            if (event === 'SIGNED_IN' && (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery'))) {
+                // Use replaceState to clear the hash without triggering a navigation/reload
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
         });
 
         return () => subscription.unsubscribe();
