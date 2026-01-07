@@ -71,6 +71,15 @@ export const LandingPage: React.FC = () => {
                     )}
                 </div>
 
+                <div className="absolute top-6 left-6 z-50">
+                    <img
+                        src="/logo.png"
+                        alt="Lumière Culinary"
+                        className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        onClick={() => navigate('/')}
+                    />
+                </div>
+
                 <AuthModal
                     isOpen={isAuthModalOpen}
                     onClose={() => setIsAuthModalOpen(false)}
