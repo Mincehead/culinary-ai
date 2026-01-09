@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Star, X, Video, Link as LinkIcon, Check, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 
@@ -83,11 +84,11 @@ export const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose,
         onClose();
     };
 
-    return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-culinary-dark border border-gray-700 w-full max-w-md rounded-lg shadow-2xl relative overflow-hidden">
+    return createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-culinary-dark border border-gray-700 w-full max-w-md rounded-lg shadow-2xl relative overflow-hidden max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-black/40">
+                <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-black/40 sticky top-0 z-10 backdrop-blur-md">
                     <h2 className="text-xl font-serif text-culinary-cream">Share Your Experience</h2>
                     <button onClick={handleClose} className="text-gray-400 hover:text-white transition-colors">
                         <X className="w-5 h-5" />
@@ -206,6 +207,7 @@ export const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose,
                     </button>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
