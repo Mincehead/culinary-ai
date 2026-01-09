@@ -65,9 +65,9 @@ export const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose,
 
             onReviewAdded();
             handleClose();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error adding review:', err);
-            alert('Failed to post review. Please try again.');
+            alert(`Failed to post review: ${err.message || 'Unknown error'}`);
         } finally {
             setIsSubmitting(false);
         }
