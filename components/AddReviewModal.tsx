@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, X, Video, Link as LinkIcon, Check } from 'lucide-react';
+import { Star, X, Video, Link as LinkIcon, Check, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 
 interface AddReviewModalProps {
@@ -13,6 +13,8 @@ export const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose,
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     if (!isOpen) return null;
@@ -28,11 +30,33 @@ export const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose,
         else if (videoUrl.includes('instagram')) platform = 'instagram';
 
         try {
+            let imageUrl = null;
+
+            // Upload Image if selected
+            if (imageFile) {
+                const fileExt = imageFile.name.split('.').pop();
+                const fileName = `${Math.random()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('review-images')
+                    .upload(filePath, imageFile);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('review-images')
+                    .getPublicUrl(filePath);
+
+                imageUrl = publicUrl;
+            }
+
             const { error } = await supabase.from('reviews').insert({
                 user_name: name,
                 rating,
                 comment,
                 video_url: videoUrl || null,
+                image_url: imageUrl,
                 platform
             });
 
@@ -52,7 +76,10 @@ export const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose,
         setName('');
         setRating(5);
         setComment('');
+        setComment('');
         setVideoUrl('');
+        setImageFile(null);
+        setPreviewUrl(null);
         onClose();
     };
 
@@ -125,6 +152,48 @@ export const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose,
                             <LinkIcon className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
                         </div>
                         <p className="text-[10px] text-gray-500 mt-1 ml-1">YouTube, TikTok, or Instagram links supported</p>
+                    </div>
+
+                    {/* Image Upload */}
+                    <div>
+                        <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-sans font-bold flex items-center gap-2">
+                            <ImageIcon className="w-3 h-3 text-culinary-gold" /> Meal Photo <span className="text-gray-600 normal-case font-normal">(Optional)</span>
+                        </label>
+
+                        {!previewUrl ? (
+                            <div className="border border-dashed border-gray-600 rounded-sm p-4 text-center hover:border-culinary-gold transition-colors cursor-pointer relative">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setImageFile(file);
+                                            setPreviewUrl(URL.createObjectURL(file));
+                                        }
+                                    }}
+                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                />
+                                <div className="text-gray-400 text-sm flex flex-col items-center gap-2">
+                                    <ImageIcon className="w-6 h-6 opacity-50" />
+                                    <span>Click to upload a photo of your meal</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="relative rounded-sm overflow-hidden border border-gray-600 group">
+                                <img src={previewUrl} alt="Preview" className="w-full h-32 object-cover" />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setImageFile(null);
+                                        setPreviewUrl(null);
+                                    }}
+                                    className="absolute top-2 right-2 bg-black/70 text-white p-1 rounded-full hover:bg-red-500 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Submit */}

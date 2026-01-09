@@ -9,6 +9,7 @@ interface Review {
     rating: number;
     comment: string;
     video_url?: string;
+    image_url?: string;
     platform?: 'youtube' | 'tiktok' | 'instagram';
     created_at: string;
 }
@@ -78,9 +79,18 @@ export const ReviewsSection: React.FC = () => {
                     reviews.map((review) => (
                         <div
                             key={review.id}
-                            className="min-w-[300px] max-w-[300px] md:min-w-[350px] bg-black/40 backdrop-blur-md border border-gray-700 p-6 rounded-sm snap-center hover:border-culinary-gold/50 transition-colors group flex flex-col justify-between"
+                            className={`min-w-[300px] max-w-[300px] md:min-w-[350px] bg-black/40 backdrop-blur-md border border-gray-700 p-6 rounded-sm snap-center hover:border-culinary-gold/50 transition-all group flex flex-col justify-between relative overflow-hidden ${review.image_url ? 'text-shadow-md' : ''}`}
                         >
-                            <div>
+                            {review.image_url && (
+                                <>
+                                    <div className="absolute inset-0 z-0">
+                                        <img src={review.image_url} alt="Meal" className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30"></div>
+                                    </div>
+                                </>
+                            )}
+
+                            <div className="relative z-10">
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
                                         <h4 className="font-serif text-culinary-cream text-lg leading-none mb-1">{review.user_name}</h4>
@@ -100,7 +110,7 @@ export const ReviewsSection: React.FC = () => {
                             </div>
 
                             {/* Footer: Date & Link */}
-                            <div className="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+                            <div className="relative z-10 mt-6 pt-4 border-t border-gray-800/50 flex items-center justify-between">
                                 <span className="text-[10px] text-gray-500 uppercase tracking-wider">
                                     {new Date(review.created_at).toLocaleDateString()}
                                 </span>
