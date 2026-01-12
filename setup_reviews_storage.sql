@@ -1,4 +1,4 @@
--- Add image_url column if it doesn't exist
+-- 1. Add image_url column to reviews table (Safe to run multiple times)
 do $$
 begin
     if not exists (select 1 from information_schema.columns where table_name = 'reviews' and column_name = 'image_url') then
@@ -6,18 +6,24 @@ begin
     end if;
 end $$;
 
--- Create storage bucket for review images if not exists
+-- 2. Create the storage bucket (Safe to run multiple times)
 insert into storage.buckets (id, name, public)
 values ('review-images', 'review-images', true)
 on conflict (id) do nothing;
 
--- Policy: Public can view images
-create policy "Public Access"
+-- 3. Cleanup old/generic policies if they exist (to avoid conflicts)
+drop policy if exists "Public Access" on storage.objects;
+drop policy if exists "Public Upload" on storage.objects;
+
+-- 4. Create new, specifically named policies
+-- Allow public access to view images in this bucket
+drop policy if exists "Review Images Access" on storage.objects;
+create policy "Review Images Access"
   on storage.objects for select
   using ( bucket_id = 'review-images' );
 
--- Policy: Everyone can upload images (simplifies UX, matches public review logic)
--- Note: In a stricter app, we would restrict to authenticated users only
-create policy "Public Upload"
+-- Allow public upload to this bucket
+drop policy if exists "Review Images Upload" on storage.objects;
+create policy "Review Images Upload"
   on storage.objects for insert
   with check ( bucket_id = 'review-images' );
