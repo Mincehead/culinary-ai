@@ -250,12 +250,12 @@ export const ChefAI: React.FC = () => {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyPress}
                                 placeholder={listening ? "Listening..." : "Ask your chef..."}
-                                className="flex-1 bg-transparent border-none focus:ring-0 text-white placeholder-gray-500 font-sans h-10"
+                                className="flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-white placeholder-gray-500 font-sans h-10"
                                 disabled={loading}
                             />
 
                             {/* Voice & Send */}
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 shrink-0">
                                 <button
                                     onClick={toggleListening}
                                     className={`p-2 rounded-full transition-all duration-300 ${listening

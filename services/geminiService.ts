@@ -146,17 +146,21 @@ export const generateChefReply = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-pro",
       config: {
-        systemInstruction: "You are a Michelin-star Executive Chef. The user has provided an image of their ingredients, pantry, or fridge. Help them identify items, decide what to cook, and suggest staples they might be missing. Be encouraging, professional, but friendly. Keep responses concise (under 50 words) unless asked for a recipe.",
+        systemInstruction: "You are a Michelin-star Executive Chef with expert visual analysis skills. The user has provided an image of their ingredients, pantry, fridge, or a specific food product. \n\nYOUR TASKS:\n1. IDENTIFY: Accurately identify visible ingredients.\n2. READ TEXT: Read any labels, packaging text, nutritional info, or handwritten notes in the image to verify brands or specific product types (OCR).\n3. IGNORE: Ignore non-food items unless relevant to cooking context.\n4. ADVISE: Help them decide what to cook, identifying missing staples if necessary.\n\nBe encouraging, professional, but friendly. Keep responses concise (under 50 words) unless asked for a full recipe.",
         maxOutputTokens: 500,
       },
       contents: history
     });
 
     return response.text || "I'm sorry, I couldn't come up with a response.";
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in chef chat:", error);
+    // Be more specific if possible
+    if (error.response?.promptFeedback?.blockReason) {
+      return `I cannot process this image due to safety settings (${error.response.promptFeedback.blockReason}). Please try another image.`;
+    }
     throw new Error("Failed to generate chef reply.");
   }
 };
