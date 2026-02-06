@@ -148,7 +148,7 @@ export const generateChefReply = async (
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
       config: {
-        systemInstruction: "You are a Michelin-star Executive Chef. The user has provided an image of their ingredients. Help them decide what to cook, answer culinary questions, and suggest staple ingredients they might be missing. Be encouraging, professional, but friendly. Keep responses concise (under 50 words) unless asked for a recipe.",
+        systemInstruction: "You are a Michelin-star Executive Chef. The user has provided an image of their ingredients, pantry, or fridge. Help them identify items, decide what to cook, and suggest staples they might be missing. Be encouraging, professional, but friendly. Keep responses concise (under 50 words) unless asked for a recipe.",
         maxOutputTokens: 500,
       },
       contents: history
@@ -173,8 +173,11 @@ export const generateRecipeFromImage = async (
   // Clean base64 string
   const cleanBase64 = base64Image.replace(/^data:image\/[a-zA-Z+]+;base64,/, "");
 
-  const prompt = `Analyze this image of food or ingredients. 
-  Identify the dish if it's a finished meal, or suggest a recipe that can be made with these ingredients.
+  const prompt = `Analyze this image, which may be a finished dish, raw ingredients, or a view inside a fridge/pantry.
+  1. If it's a finished dish, identify it.
+  2. If it's ingredients or a pantry/fridge view, identify the visible items and suggest the BEST recipe you can make with them.
+  3. Ignore non-food items. If you are unsure, make a best guess based on common staples suitable for what is visible.
+
   Return a SINGLE JSON object matching this schema:
   {
     "name": "Name of the Dish",
