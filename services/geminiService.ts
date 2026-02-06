@@ -162,7 +162,7 @@ export const generateChefReply = async (
     if (error.response?.promptFeedback?.blockReason) {
       return `I cannot process this image due to safety settings (${error.response.promptFeedback.blockReason}). Please try another image.`;
     }
-    throw new Error("Failed to generate chef reply.");
+    throw new Error(`Gemini API Error: ${error.message || JSON.stringify(error)}`);
   }
 };
 
