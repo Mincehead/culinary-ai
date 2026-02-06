@@ -166,9 +166,12 @@ export const generateRecipeFromImage = async (
 ): Promise<RecipeSummary> => {
   const ai = getAiClient();
 
-  // Use flash for multimodal capabilities (cheaper/faster for this)
+  // Detect mime type from base64 header
+  const mimeMatch = base64Image.match(/^data:(image\/[a-zA-Z+]+);base64,/);
+  const mimeType = mimeMatch ? mimeMatch[1] : "image/jpeg";
+
   // Clean base64 string
-  const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+  const cleanBase64 = base64Image.replace(/^data:image\/[a-zA-Z+]+;base64,/, "");
 
   const prompt = `Analyze this image of food or ingredients. 
   Identify the dish if it's a finished meal, or suggest a recipe that can be made with these ingredients.
@@ -179,11 +182,11 @@ export const generateRecipeFromImage = async (
     "prepTime": "Estimated prep time",
     "difficulty": "Easy/Medium/Hard",
     "imageKeyword": "Main ingredient or dish name for search"
-  }
-  Do not include markdown formatting like \`\`\`json. Just the raw JSON.`;
+  }`;
 
   try {
-    console.log("[geminiService] analyzing image with gemini-1.5-flash...");
+    console.log(`[geminiService] analyzing image (${mimeType}) with gemini-1.5-flash...`);
+
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
       contents: [
@@ -192,13 +195,16 @@ export const generateRecipeFromImage = async (
             { text: prompt },
             {
               inlineData: {
-                mimeType: "image/jpeg",
+                mimeType: mimeType,
                 data: cleanBase64
               }
             }
           ]
         }
-      ]
+      ],
+      config: {
+        responseMimeType: "application/json", // Enforce JSON output
+      }
     });
 
     const text = response.text;
@@ -206,9 +212,7 @@ export const generateRecipeFromImage = async (
 
     if (!text) throw new Error("No analysis received from AI");
 
-    // Clean potential markdown blocks
-    const cleanText = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleanText) as RecipeSummary;
+    return JSON.parse(text) as RecipeSummary;
 
   } catch (error: any) {
     console.error("Error analyzing image:", error);
