@@ -7,7 +7,8 @@ import { RecipeSummary } from '../types';
 
 export const SmartCamera: React.FC = () => {
     const navigate = useNavigate();
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null); // Camera
+    const uploadInputRef = useRef<HTMLInputElement>(null); // Upload
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
     const [result, setResult] = useState<RecipeSummary | null>(null);
@@ -51,7 +52,7 @@ export const SmartCamera: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white pt-24 px-4 pb-12">
+        <div className="min-h-[100dvh] bg-black text-white pt-24 px-4 pb-12">
             <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-serif text-culinary-gold mb-4">Smart Chef Camera</h1>
@@ -91,7 +92,7 @@ export const SmartCamera: React.FC = () => {
                                     <span className="text-sm font-sans uppercase tracking-widest">Take Photo</span>
                                 </button>
                                 <button
-                                    onClick={() => fileInputRef.current?.click()}
+                                    onClick={() => uploadInputRef.current?.click()}
                                     className="flex flex-col items-center p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all border border-gray-600 hover:border-culinary-gold group-hover:scale-105 duration-300"
                                 >
                                     <Upload className="w-10 h-10 text-culinary-gold mb-2" />
@@ -107,6 +108,13 @@ export const SmartCamera: React.FC = () => {
                         className="hidden"
                         accept="image/*"
                         capture="environment"
+                        onChange={handleFileSelect}
+                    />
+                    <input
+                        type="file"
+                        ref={uploadInputRef}
+                        className="hidden"
+                        accept="image/*"
                         onChange={handleFileSelect}
                     />
                 </div>

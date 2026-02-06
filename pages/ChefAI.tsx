@@ -20,6 +20,7 @@ export const ChefAI: React.FC = () => {
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cameraInputRef = useRef<HTMLInputElement>(null);
     const recognitionRef = useRef<any>(null);
 
     // Scroll to bottom on new message
@@ -134,7 +135,7 @@ export const ChefAI: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-black text-white pt-20 pb-4 md:px-4">
+        <div className="flex flex-col h-[100dvh] bg-black text-white pt-20 pb-4 md:px-4">
             <div className="flex-1 max-w-4xl mx-auto w-full bg-gray-900/40 md:border border-gray-800 md:rounded-2xl flex flex-col overflow-hidden relative shadow-2xl">
 
                 {/* Header */}
@@ -218,7 +219,7 @@ export const ChefAI: React.FC = () => {
                                     <ImageIcon className="w-5 h-5" />
                                 </button>
                                 <button
-                                    onClick={() => fileInputRef.current?.click()} // Camera trigger for mobile usually same input
+                                    onClick={() => cameraInputRef.current?.click()} // Camera trigger
                                     className="p-2 text-gray-400 hover:text-culinary-gold hover:bg-white/5 rounded-full transition-colors md:hidden"
                                     title="Take Photo"
                                 >
@@ -231,6 +232,15 @@ export const ChefAI: React.FC = () => {
                                 ref={fileInputRef}
                                 className="hidden"
                                 accept="image/*"
+                                onChange={handleFileSelect}
+                            />
+
+                            <input
+                                type="file"
+                                ref={cameraInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                capture="environment"
                                 onChange={handleFileSelect}
                             />
 
