@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RecipeSummary, CuisineType } from '../types';
-import { generateImage } from '../services/geminiService';
+import { getOrGenerateImage } from '../services/geminiService';
 import ImageWithLoader from './ImageWithLoader';
 import { Clock, BarChart2 } from 'lucide-react';
 
@@ -29,7 +29,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, selectedCuisine,
                 // For list items, we might just try. If it fails (no key), we might want a fallback or just leave it blank/placeholder.
 
                 const prompt = `Professional food photography of ${recipe.name} ${selectedCuisine || ''} dish, cinematic lighting, appetizing, michelin star presentation, 8k resolution.`;
-                const url = await generateImage(prompt, '1K', '4:3');
+                const url = await getOrGenerateImage(recipe.name, prompt, '1K');
 
                 if (isMounted) {
                     setImageUrl(url);

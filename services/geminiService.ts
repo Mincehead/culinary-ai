@@ -139,12 +139,24 @@ export const generateRecipeDetail = async (
   }
 };
 
+
+// Helper to convert base64 to Blob
+const base64ToBlob = (base64: string, mimeType: string) => {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type: mimeType });
+};
+
 export const generateImage = async (
   prompt: string,
   size: ImageSize,
   aspectRatio: string = "16:9"
 ): Promise<string> => {
-  // Always create a new client to ensure we pick up the latest API key from process.env if it changed via aistudio selector
+  // Always create a new client
   const ai = getAiClient();
 
   try {
@@ -155,7 +167,7 @@ export const generateImage = async (
       },
       config: {
         imageConfig: {
-          aspectRatio: aspectRatio, // Dynamic aspect ratio
+          aspectRatio: aspectRatio,
           imageSize: size
         }
       },
@@ -171,5 +183,75 @@ export const generateImage = async (
   } catch (error) {
     console.error("Error generating image:", error);
     throw error;
+  }
+};
+
+import { supabase } from "./supabaseClient";
+
+/**
+ * Checks Supabase Storage for an existing image for the recipe.
+ * If found, returns the public URL.
+ * If not, generates a new one, uploads it, and returns the URL.
+ */
+export const getOrGenerateImage = async (
+  recipeName: string,
+  prompt: string,
+  size: ImageSize = '1K'
+): Promise<string> => {
+  try {
+    // 1. Sanitize filename
+    const filename = `${recipeName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+    const bucket = 'recipe-images';
+
+    // 2. Check if exists (HEAD request or try to get public URL and check validity??)
+    // Simpler: Just try to get Public URL. If we want to be sure it exists, we might need a list or metadata check.
+    // However, Storage Public URLs are predictable.
+    // Let's try to 'download' metadata or list to see if it exists to avoid trying to load a 404 image on client.
+
+    const { data: existingFiles } = await supabase
+      .storage
+      .from(bucket)
+      .list('', {
+        limit: 1,
+        search: filename
+      });
+
+    if (existingFiles && existingFiles.length > 0) {
+      console.log(`[Cache Hit] Found image for ${recipeName}`);
+      const { data } = supabase.storage.from(bucket).getPublicUrl(filename);
+      return data.publicUrl;
+    }
+
+    console.log(`[Cache Miss] Generating image for ${recipeName}...`);
+
+    // 3. Generate
+    const base64Image = await generateImage(prompt, size, '4:3');
+
+    // 4. Upload
+    // Extract actual base64 data (remove "data:image/png;base64,")
+    const base64Data = base64Image.split(',')[1];
+    const blob = base64ToBlob(base64Data, 'image/png');
+
+    const { error: uploadError } = await supabase
+      .storage
+      .from(bucket)
+      .upload(filename, blob, {
+        contentType: 'image/png',
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.warn("Failed to upload to cache, returning base64:", uploadError);
+      return base64Image;
+    }
+
+    // 5. Return new Public URL
+    const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
+    return publicUrlData.publicUrl;
+
+  } catch (err) {
+    console.error("Error in getOrGenerateImage:", err);
+    // Fallback to generating without cache if something fails
+    return await generateImage(prompt, size, '4:3');
   }
 };
