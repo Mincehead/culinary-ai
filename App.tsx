@@ -8,6 +8,7 @@ import { RecipeDetail } from './pages/RecipeDetail';
 import { Profile } from './pages/Profile';
 import { PrivacyPolicy } from './pages/Privacy';
 import { TermsOfService } from './pages/Terms';
+import { SmartCamera } from './pages/SmartCamera';
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/smart-camera" element={<SmartCamera />} />
           <Route path="/recipes" element={<RecipeList />} />
           <Route path="/recipe/preview" element={<RecipeDetail />} />
           <Route path="/profile" element={<Profile />} />

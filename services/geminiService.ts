@@ -139,6 +139,58 @@ export const generateRecipeDetail = async (
   }
 };
 
+export const generateRecipeFromImage = async (
+  base64Image: string
+): Promise<RecipeSummary> => {
+  const ai = getAiClient();
+
+  // Use flash for multimodal capabilities (cheaper/faster for this)
+  // Clean base64 string
+  const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+
+  const prompt = `Analyze this image of food or ingredients. 
+  Identify the dish if it's a finished meal, or suggest a recipe that can be made with these ingredients.
+  Return a SINGLE JSON object matching this schema:
+  {
+    "name": "Name of the Dish",
+    "description": "Appetizing description based on visual analysis",
+    "prepTime": "Estimated prep time",
+    "difficulty": "Easy/Medium/Hard",
+    "imageKeyword": "Main ingredient or dish name for search"
+  }
+  Do not include markdown formatting like \`\`\`json. Just the raw JSON.`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash-exp", // Using latest flash for vision
+      contents: [
+        {
+          parts: [
+            { text: prompt },
+            {
+              inlineData: {
+                mimeType: "image/jpeg", // Assuming jpeg/png, API is forgiving
+                data: cleanBase64
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    const text = response.text;
+    if (!text) throw new Error("No analysis received");
+
+    // Clean potential markdown blocks
+    const cleanText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    return JSON.parse(cleanText) as RecipeSummary;
+
+  } catch (error) {
+    console.error("Error analyzing image:", error);
+    throw new Error("Failed to analyze the image.");
+  }
+};
+
 
 // Helper to convert base64 to Blob
 const base64ToBlob = (base64: string, mimeType: string) => {

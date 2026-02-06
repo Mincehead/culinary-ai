@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Background from '../components/Background';
 import { AuthModal } from '../components/AuthModal';
 import { useAuth } from '../contexts/AuthContext';
 import { CuisineType, RecipeTag, DietaryRequirement } from '../types';
-import { ChevronRight, Search, Globe, Wheat, Flame, Check, User, LogOut } from 'lucide-react';
+import { ChevronRight, Search, Globe, Wheat, Flame, Check, User, LogOut, Camera, ArrowRight } from 'lucide-react';
 import { ReviewsSection } from '../components/ReviewsSection';
 
 export const LandingPage: React.FC = () => {
@@ -110,6 +110,13 @@ export const LandingPage: React.FC = () => {
                                 <ChevronRight className="w-5 h-5" />
                             </button>
                         </form>
+                        <div className="mt-8 text-center">
+                            <Link to="/smart-camera" className="inline-flex items-center px-6 py-3 border border-culinary-gold/50 rounded-full text-culinary-gold hover:bg-culinary-gold hover:text-culinary-dark transition-all duration-300 font-sans tracking-widest text-sm group">
+                                <Camera className="w-4 h-4 mr-2" />
+                                <span className="mr-1">TRY SMART CHEF CAMERA</span>
+                                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                        </div>
                     </section>
 
                     <section className="mb-12">
