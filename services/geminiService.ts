@@ -161,15 +161,16 @@ export const generateRecipeFromImage = async (
   Do not include markdown formatting like \`\`\`json. Just the raw JSON.`;
 
   try {
+    console.log("[geminiService] analyzing image with gemini-1.5-flash...");
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp", // Using latest flash for vision
+      model: "gemini-1.5-flash",
       contents: [
         {
           parts: [
             { text: prompt },
             {
               inlineData: {
-                mimeType: "image/jpeg", // Assuming jpeg/png, API is forgiving
+                mimeType: "image/jpeg",
                 data: cleanBase64
               }
             }
@@ -179,15 +180,21 @@ export const generateRecipeFromImage = async (
     });
 
     const text = response.text;
-    if (!text) throw new Error("No analysis received");
+    console.log("[geminiService] Analysis result:", text ? text.substring(0, 50) + "..." : "No text");
+
+    if (!text) throw new Error("No analysis received from AI");
 
     // Clean potential markdown blocks
     const cleanText = text.replace(/```json/g, "").replace(/```/g, "").trim();
     return JSON.parse(cleanText) as RecipeSummary;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error analyzing image:", error);
-    throw new Error("Failed to analyze the image.");
+    // Log more details if available
+    if (error.response) {
+      console.error("API Error details:", JSON.stringify(error.response));
+    }
+    throw new Error("Failed to analyze the image: " + (error.message || "Unknown error"));
   }
 };
 
