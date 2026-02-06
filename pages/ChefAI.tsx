@@ -119,9 +119,10 @@ export const ChefAI: React.FC = () => {
 
             setMessages(prev => [...prev, { role: 'model', text: replyText }]);
 
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            setMessages(prev => [...prev, { role: 'model', text: "I apologize, Chef. I had trouble processing that request. Please try again." }]);
+            const errorMessage = error.message || "I apologize, Chef. I had trouble processing that request. Please try again.";
+            setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
         } finally {
             setLoading(false);
         }
