@@ -149,7 +149,9 @@ export const ChefAI: React.FC = () => {
                             <h1 className="font-serif text-xl text-culinary-gold tracking-wide">Lumière Chef AI</h1>
                             <div className="flex items-center space-x-2">
                                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                <span className="text-xs text-gray-400 font-sans uppercase tracking-widest">Online</span>
+                                <span className="text-xs text-gray-400 font-sans uppercase tracking-widest">
+                                    {import.meta.env.VITE_GEMINI_API_KEY ? "System: Connected" : "🔴 ERROR: Missing API Key"}
+                                </span>
                             </div>
                         </div>
                     </div>

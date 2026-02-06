@@ -6,6 +6,7 @@ import { RecipeSummary, RecipeDetail, CuisineType, RecipeTag, ImageSize } from "
 // Note: For image generation with gemini-3-pro-image-preview, the key must be selected by the user via window.aistudio
 const getAiClient = () => {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  console.log("[geminiService] Initializing client. Key present?", !!apiKey, "Key length:", apiKey?.length);
   if (!apiKey) {
     throw new Error("Missing API Key. Please add VITE_GEMINI_API_KEY to your Vercel Environment Variables and Redeploy.");
   }
