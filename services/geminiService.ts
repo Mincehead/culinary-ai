@@ -139,6 +139,28 @@ export const generateRecipeDetail = async (
   }
 };
 
+export const generateChefReply = async (
+  history: { role: 'user' | 'model'; parts: { text: string }[] }[]
+): Promise<string> => {
+  const ai = getAiClient();
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-1.5-flash",
+      config: {
+        systemInstruction: "You are a Michelin-star Executive Chef. The user has provided an image of their ingredients. Help them decide what to cook, answer culinary questions, and suggest staple ingredients they might be missing. Be encouraging, professional, but friendly. Keep responses concise (under 50 words) unless asked for a recipe.",
+        maxOutputTokens: 500,
+      },
+      contents: history
+    });
+
+    return response.text || "I'm sorry, I couldn't come up with a response.";
+  } catch (error) {
+    console.error("Error in chef chat:", error);
+    throw new Error("Failed to generate chef reply.");
+  }
+};
+
 export const generateRecipeFromImage = async (
   base64Image: string
 ): Promise<RecipeSummary> => {

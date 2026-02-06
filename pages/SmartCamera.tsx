@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Upload, ChefHat, ArrowRight, Loader } from 'lucide-react';
 import { generateRecipeFromImage } from '../services/geminiService';
+import { ChefChat } from '../components/ChefChat';
 import { RecipeSummary } from '../types';
 
 export const SmartCamera: React.FC = () => {
@@ -141,34 +142,45 @@ export const SmartCamera: React.FC = () => {
                 )}
 
                 {/* Result Card */}
-                {result && (
-                    <div className="mt-8 bg-gray-900 border border-gray-700 rounded-xl overflow-hidden animate-fade-in">
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-culinary-gold text-xs font-sans uppercase tracking-widest">Analysis Complete</span>
-                                <div className="flex items-center space-x-3 text-xs text-gray-400">
-                                    <span>{result.prepTime}</span>
-                                    <span>•</span>
-                                    <span>{result.difficulty}</span>
+                {/* Result Card & Chat Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    {/* Left: Result Card */}
+                    {result && (
+                        <div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden animate-fade-in h-fit">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-culinary-gold text-xs font-sans uppercase tracking-widest">Analysis Complete</span>
+                                    <div className="flex items-center space-x-3 text-xs text-gray-400">
+                                        <span>{result.prepTime}</span>
+                                        <span>•</span>
+                                        <span>{result.difficulty}</span>
+                                    </div>
                                 </div>
+
+                                <h2 className="text-3xl font-serif text-white mb-3">{result.name}</h2>
+                                <p className="text-gray-300 font-sans leading-relaxed mb-6">{result.description}</p>
+
+                                <button
+                                    onClick={handleCreateRecipe}
+                                    className="w-full bg-culinary-gold text-black py-4 font-bold font-sans tracking-widest hover:bg-yellow-400 transition-all flex items-center justify-center group"
+                                >
+                                    GENERATE FULL RECIPE
+                                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                </button>
+                                <p className="text-center text-xs text-gray-500 mt-3">
+                                    Proceed to get step-by-step instructions.
+                                </p>
                             </div>
-
-                            <h2 className="text-3xl font-serif text-white mb-3">{result.name}</h2>
-                            <p className="text-gray-300 font-sans leading-relaxed mb-6">{result.description}</p>
-
-                            <button
-                                onClick={handleCreateRecipe}
-                                className="w-full bg-culinary-gold text-black py-4 font-bold font-sans tracking-widest hover:bg-yellow-400 transition-all flex items-center justify-center group"
-                            >
-                                GENERATE FULL RECIPE
-                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                            <p className="text-center text-xs text-gray-500 mt-3">
-                                Proceed to get step-by-step instructions.
-                            </p>
                         </div>
-                    </div>
-                )}
+                    )}
+
+                    {/* Right: Chef Chat */}
+                    {result && (
+                        <div className="h-[500px] animate-fade-in delay-150">
+                            <ChefChat initialImage={imagePreview} />
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
