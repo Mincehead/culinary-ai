@@ -80,6 +80,22 @@ export const ChefAI: React.FC = () => {
         }
     }, [isLiveMode]);
 
+    // Assign camera stream to video element when both are ready
+    useEffect(() => {
+        if (cameraStream && videoRef.current) {
+            console.log('[Camera] Assigning stream to video element');
+            videoRef.current.srcObject = cameraStream;
+
+            videoRef.current.play()
+                .then(() => {
+                    console.log('[Camera] ✅ Video playing successfully');
+                })
+                .catch(err => {
+                    console.error('[Camera] ❌ Video play error:', err);
+                });
+        }
+    }, [cameraStream, videoRef.current]);
+
     // Live Mode camera effect
     useEffect(() => {
         if (isLiveMode) {
@@ -97,51 +113,20 @@ export const ChefAI: React.FC = () => {
                 .then(stream => {
                     console.log('[Camera] ✅ Stream obtained:', stream);
                     console.log('[Camera] Video tracks:', stream.getVideoTracks());
-                    alert('Camera stream obtained! Tracks: ' + stream.getVideoTracks().length);
-
                     setCameraStream(stream);
-
-                    if (videoRef.current) {
-                        console.log('[Camera] Setting video srcObject...');
-                        videoRef.current.srcObject = stream;
-
-                        // Explicitly play the video
-                        videoRef.current.play()
-                            .then(() => {
-                                console.log('[Camera] ✅ Video playing');
-                                alert('Video is now playing!');
-                            })
-                            .catch(err => {
-                                console.error('[Camera] ❌ Video play error:', err);
-                                alert('Video play error: ' + err.message);
-                            });
-                    } else {
-                        console.error('[Camera] ❌ Video ref is null');
-                        alert('Video element not found!');
-                    }
                 })
                 .catch(err => {
                     console.error('[Camera] ❌ Initial request failed:', err);
-                    alert('Camera error: ' + err.message + '. Trying fallback...');
 
                     // Try again without facingMode constraint
                     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                         .then(stream => {
                             console.log('[Camera] ✅ Fallback stream obtained:', stream);
-                            alert('Camera fallback successful!');
-
                             setCameraStream(stream);
-                            if (videoRef.current) {
-                                videoRef.current.srcObject = stream;
-                                videoRef.current.play().catch(e => {
-                                    console.error('[Camera] Fallback play error:', e);
-                                    alert('Fallback play error: ' + e.message);
-                                });
-                            }
                         })
                         .catch(fallbackErr => {
                             console.error('[Camera] ❌ Fallback failed:', fallbackErr);
-                            alert('Camera access denied: ' + fallbackErr.message + '. Please check permissions in browser settings.');
+                            alert('Camera access denied. Please check browser permissions.');
                             setIsLiveMode(false);
                         });
                 });
