@@ -19,12 +19,14 @@ export const ChefAI: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isLiveMode, setIsLiveMode] = useState(false);
     const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+    const [isSpeaking, setIsSpeaking] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
     const recognitionRef = useRef<any>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
     // Scroll to bottom on new message - DISABLED to prevent jumping on mobile
     // useEffect(() => {
@@ -217,6 +219,11 @@ export const ChefAI: React.FC = () => {
 
             setMessages(prev => [...prev, { role: 'model', text: replyText }]);
 
+            // Speak AI response in Live Mode
+            if (isLiveMode && replyText) {
+                speakText(replyText);
+            }
+
         } catch (error: any) {
             console.error(error);
             const errorMessage = error.message || "I apologize, Chef. I had trouble processing that request. Please try again.";
@@ -243,6 +250,26 @@ export const ChefAI: React.FC = () => {
         window.addEventListener('liveModeAutoSend', handleAutoSend);
         return () => window.removeEventListener('liveModeAutoSend', handleAutoSend);
     }, [isLiveMode, input, messages, selectedImage, loading]);
+
+    // Text-to-speech function
+    const speakText = (text: string) => {
+        // Cancel any ongoing speech
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+
+        speechSynthesisRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
+    };
 
     return (
         <div className="flex flex-col h-[100dvh] bg-black text-white pt-20 pb-4 md:px-4">
@@ -279,19 +306,33 @@ export const ChefAI: React.FC = () => {
                 </div>
 
                 {/* Live Mode Camera Feed */}
-                {isLiveMode && cameraStream && (
-                    <div className="absolute bottom-24 right-4 z-20 w-48 h-36 md:w-64 md:h-48 rounded-xl overflow-hidden border-2 border-red-500 shadow-2xl shadow-red-500/50">
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            muted
-                            className="w-full h-full object-cover"
-                        />
+                {isLiveMode && (
+                    <div className="absolute bottom-24 right-4 z-20 w-48 h-36 md:w-64 md:h-48 rounded-xl overflow-hidden border-2 border-red-500 shadow-2xl shadow-red-500/50 bg-gray-900">
+                        {cameraStream ? (
+                            <video
+                                ref={videoRef}
+                                autoPlay
+                                playsInline
+                                muted
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white text-xs text-center p-2">
+                                <div>
+                                    <Camera className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                    <p>Requesting camera...</p>
+                                </div>
+                            </div>
+                        )}
                         <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center space-x-1 animate-pulse">
                             <div className="w-2 h-2 bg-white rounded-full"></div>
                             <span>LIVE</span>
                         </div>
+                        {isSpeaking && (
+                            <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center space-x-1">
+                                <span>🔊 Speaking</span>
+                            </div>
+                        )}
                     </div>
                 )}
 
