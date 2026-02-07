@@ -20,6 +20,7 @@ export const ChefAI: React.FC = () => {
     const [isLiveMode, setIsLiveMode] = useState(false);
     const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [lastFrameCapture, setLastFrameCapture] = useState<number>(0);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +28,7 @@ export const ChefAI: React.FC = () => {
     const recognitionRef = useRef<any>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // Scroll to bottom on new message - DISABLED to prevent jumping on mobile
     // useEffect(() => {
@@ -95,6 +97,48 @@ export const ChefAI: React.FC = () => {
                 });
         }
     }, [cameraStream, videoRef.current]);
+
+    // Capture frame from video for AI analysis
+    const captureFrame = (): string | null => {
+        if (!videoRef.current || !canvasRef.current) return null;
+
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+
+        // Set canvas size to match video
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        // Draw current video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert to base64 JPEG
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        console.log('[Camera] Frame captured');
+        setLastFrameCapture(Date.now());
+
+        return dataUrl;
+    };
+
+    // Auto-capture frames in Live Mode
+    useEffect(() => {
+        if (isLiveMode && cameraStream && videoRef.current) {
+            console.log('[Camera] Starting auto-capture every 5 seconds');
+
+            const interval = setInterval(() => {
+                const frame = captureFrame();
+                if (frame) {
+                    setSelectedImage(frame);
+                    console.log('[Camera] Frame auto-attached for next query');
+                }
+            }, 5000); // Capture every 5 seconds
+
+            return () => clearInterval(interval);
+        }
+    }, [isLiveMode, cameraStream]);
 
     // Live Mode camera effect
     useEffect(() => {
@@ -357,8 +401,16 @@ export const ChefAI: React.FC = () => {
                                 <span>🔊 Speaking</span>
                             </div>
                         )}
+                        {selectedImage && (Date.now() - lastFrameCapture < 2000) && (
+                            <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center space-x-1">
+                                <span>👁️ AI Vision</span>
+                            </div>
+                        )}
                     </div>
                 )}
+
+                {/* Hidden canvas for frame capture */}
+                <canvas ref={canvasRef} className="hidden" />
 
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
