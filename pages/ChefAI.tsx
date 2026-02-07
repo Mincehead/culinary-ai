@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, Camera, Image as ImageIcon, StopCircle, ChefHat, X, Loader, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Send, Mic, Camera, Image as ImageIcon, StopCircle, ChefHat, X, Loader, Bookmark, BookmarkCheck, Volume2 } from 'lucide-react';
 import { generateChefReply } from '../services/geminiService';
 import ReactMarkdown from 'react-markdown';
 import { saveRecipe } from '../services/savedRecipesService';
