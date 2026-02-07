@@ -13,8 +13,8 @@ const getAiClient = () => {
   return new GoogleGenAI({ apiKey });
 };
 
-const MODEL_NAME = "gemini-1.5-flash-001";
-const IMAGE_MODEL_NAME = "gemini-1.5-pro";
+const MODEL_NAME = "gemini-2.5-flash";
+const IMAGE_MODEL_NAME = "gemini-2.5-flash";
 
 export const generateRecipeList = async (
   cuisine: CuisineType | null,
@@ -147,7 +147,7 @@ export const generateChefReply = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash-001",
+      model: "gemini-2.5-flash",
       config: {
         systemInstruction: "You are a Michelin-star Executive Chef with expert visual analysis skills. The user has provided an image of their ingredients, pantry, fridge, or a specific food product. \n\nYOUR TASKS:\n1. IDENTIFY: Accurately identify visible ingredients.\n2. READ TEXT: Read any labels, packaging text, nutritional info, or handwritten notes in the image to verify brands or specific product types (OCR).\n3. IGNORE: Ignore non-food items unless relevant to cooking context.\n4. ADVISE: Help them decide what to cook, identifying missing staples if necessary.\n\nBe encouraging, professional, but friendly. Keep responses concise (under 50 words) unless asked for a full recipe.",
         maxOutputTokens: 500,
@@ -196,7 +196,7 @@ export const generateRecipeFromImage = async (
     console.log(`[geminiService] analyzing image (${mimeType}) with gemini-1.5-flash...`);
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash-001",
+      model: "gemini-2.5-flash",
       contents: [
         {
           parts: [
