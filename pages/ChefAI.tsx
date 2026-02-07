@@ -4,6 +4,7 @@ import { generateChefReply } from '../services/geminiService';
 import ReactMarkdown from 'react-markdown';
 import { saveRecipe } from '../services/savedRecipesService';
 import { generateSpeech } from '../services/elevenLabsService';
+import { synthesizeSpeech, RECOMMENDED_VOICES } from '../services/googleTTSService';
 
 interface Message {
     role: 'user' | 'model';
@@ -280,7 +281,7 @@ export const ChefAI: React.FC = () => {
 
             // Speak AI response in Live Mode
             if (isLiveMode && replyText) {
-                speakText(replyText);
+                speakTextGoogle(replyText);
             }
 
         } catch (error: any) {
