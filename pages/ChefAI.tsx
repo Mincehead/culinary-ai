@@ -26,6 +26,9 @@ export const ChefAI: React.FC = () => {
     const [lastFrameCapture, setLastFrameCapture] = useState<number>(0);
     const [savingRecipe, setSavingRecipe] = useState<number | null>(null);
     const [savedRecipes, setSavedRecipes] = useState<Set<number>>(new Set());
+    const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+    const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+    const [showVoiceSelector, setShowVoiceSelector] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,6 +38,32 @@ export const ChefAI: React.FC = () => {
     const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    // Load available voices
+    useEffect(() => {
+        const loadVoices = () => {
+            const voices = window.speechSynthesis.getVoices();
+            setAvailableVoices(voices);
+
+            // Load saved preference or set default
+            const savedVoiceName = localStorage.getItem('preferredVoice');
+            if (savedVoiceName) {
+                const voice = voices.find(v => v.name === savedVoiceName);
+                if (voice) setSelectedVoice(voice);
+            } else {
+                // Default to best available voice
+                const defaultVoice = voices.find(v =>
+                    v.name.toLowerCase().includes('male') ||
+                    v.name.toLowerCase().includes('google') ||
+                    v.name.toLowerCase().includes('natural')
+                ) || voices[0];
+                setSelectedVoice(defaultVoice);
+            }
+        };
+
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }, []);
 
     // Scroll to bottom on new message - DISABLED to prevent jumping on mobile
     // useEffect(() => {
@@ -319,18 +348,9 @@ export const ChefAI: React.FC = () => {
 
         const utterance = new SpeechSynthesisUtterance(text);
 
-        // Select the best available voice (preferring natural/Google voices)
-        const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(voice =>
-            voice.name.includes('Google') ||
-            voice.name.includes('Natural') ||
-            voice.name.includes('Premium') ||
-            voice.name.includes('Enhanced')
-        ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
-
-        if (preferredVoice) {
-            utterance.voice = preferredVoice;
-            console.log('Using voice:', preferredVoice.name);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.log('Using voice:', selectedVoice.name);
         }
 
         utterance.rate = 0.95; // Slightly slower for clarity
@@ -563,7 +583,7 @@ export const ChefAI: React.FC = () => {
                                                 <ReactMarkdown>{msg.text}</ReactMarkdown>
                                                 {/* Read Aloud Button */}
                                                 <button
-                                                    onClick={() => speakTextElevenLabs(msg.text!)}
+                                                    onClick={() => speakText(msg.text!)}
                                                     className="mt-3 mr-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center space-x-2 bg-blue-600 text-white hover:bg-blue-700"
                                                 >
                                                     <Volume2 className="w-4 h-4" />
