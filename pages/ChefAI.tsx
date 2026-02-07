@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, Camera, Image as ImageIcon, StopCircle, ChefHat, X, Loader } from 'lucide-react';
+import { Send, Mic, Camera, Image as ImageIcon, StopCircle, ChefHat, X, Loader, Bookmark, BookmarkCheck } from 'lucide-react';
 import { generateChefReply } from '../services/geminiService';
 import ReactMarkdown from 'react-markdown';
+import { saveRecipe } from '../services/savedRecipesService';
 
 interface Message {
     role: 'user' | 'model';
@@ -21,6 +22,8 @@ export const ChefAI: React.FC = () => {
     const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [lastFrameCapture, setLastFrameCapture] = useState<number>(0);
+    const [savingRecipe, setSavingRecipe] = useState<number | null>(null);
+    const [savedRecipes, setSavedRecipes] = useState<Set<number>>(new Set());
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -339,6 +342,45 @@ export const ChefAI: React.FC = () => {
         window.speechSynthesis.speak(utterance);
     };
 
+    // Save recipe from AI message
+    const handleSaveRecipe = async (messageIndex: number, messageText: string) => {
+        setSavingRecipe(messageIndex);
+
+        try {
+            // Extract recipe name from content (first line or first 50 chars)
+            const firstLine = messageText.split('\n')[0];
+            const recipeName = firstLine.length > 50
+                ? firstLine.substring(0, 47) + '...'
+                : firstLine || 'Untitled Recipe';
+
+            const { data, error } = await saveRecipe({
+                recipe_name: recipeName,
+                recipe_content: messageText,
+                conversation_context: messages.slice(Math.max(0, messageIndex - 2), messageIndex + 1)
+                    .map(m => `${m.role}: ${m.text}`)
+                    .join('\n')
+            });
+
+            if (error) {
+                console.error('Save error:', error);
+                alert('Failed to save recipe: ' + error.message);
+            } else {
+                setSavedRecipes(prev => new Set(prev).add(messageIndex));
+                // Show success feedback
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-24 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                toast.textContent = '✓ Recipe saved!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+            }
+        } catch (err: any) {
+            console.error('Save error:', err);
+            alert('Failed to save recipe');
+        } finally {
+            setSavingRecipe(null);
+        }
+    };
+
     return (
         <div className="flex flex-col h-[100dvh] bg-black text-white pt-20 pb-4 md:px-4">
             <div className="flex-1 max-w-4xl mx-auto w-full bg-gray-900/40 md:border border-gray-800 md:rounded-2xl flex flex-col overflow-hidden relative shadow-2xl">
@@ -428,10 +470,39 @@ export const ChefAI: React.FC = () => {
 
                                 {msg.text && (
                                     <div className={`px-5 py-3 rounded-2xl text-lg md:text-2xl leading-relaxed font-sans shadow-md ${msg.role === 'user'
-                                        ? 'bg-culinary-gold text-black rounded-tr-sm'
-                                        : 'bg-gray-800 text-gray-200 rounded-tl-sm border border-gray-700'
+                                            ? 'bg-culinary-gold text-black rounded-tr-sm'
+                                            : 'bg-gray-800 text-gray-200 rounded-tl-sm border border-gray-700'
                                         }`}>
-                                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                                        {msg.role === 'model' ? (
+                                            <>
+                                                <ReactMarkdown>{msg.text}</ReactMarkdown>
+                                                {/* Save Recipe Button - shows on messages > 100 chars */}
+                                                {msg.text.length > 100 && (
+                                                    <button
+                                                        onClick={() => handleSaveRecipe(idx, msg.text!)}
+                                                        disabled={savingRecipe === idx || savedRecipes.has(idx)}
+                                                        className={`mt-3 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 ${savedRecipes.has(idx)
+                                                                ? 'bg-green-600 text-white cursor-default'
+                                                                : 'bg-culinary-gold text-black hover:bg-yellow-500'
+                                                            }`}
+                                                    >
+                                                        {savedRecipes.has(idx) ? (
+                                                            <>
+                                                                <BookmarkCheck className="w-4 h-4" />
+                                                                <span>Saved</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Bookmark className="w-4 h-4" />
+                                                                <span>{savingRecipe === idx ? 'Saving...' : 'Save Recipe'}</span>
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </>
+                                        ) : (
+                                            msg.text
+                                        )}
                                     </div>
                                 )}
                             </div>
