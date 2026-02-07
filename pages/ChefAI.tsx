@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, Camera, Image as ImageIcon, StopCircle, ChefHat, X, Loader, Bookmark, BookmarkCheck, Volume2 } from 'lucide-react';
+import { Send, Mic, Camera, Image as ImageIcon, StopCircle, ChefHat, X, Loader, Bookmark, BookmarkCheck, Volume2, Pause, Play } from 'lucide-react';
 import { generateChefReply } from '../services/geminiService';
 import ReactMarkdown from 'react-markdown';
 import { saveRecipe } from '../services/savedRecipesService';
+import { generateSpeech } from '../services/elevenLabsService';
 
 interface Message {
     role: 'user' | 'model';
@@ -21,6 +22,7 @@ export const ChefAI: React.FC = () => {
     const [isLiveMode, setIsLiveMode] = useState(false);
     const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
     const [lastFrameCapture, setLastFrameCapture] = useState<number>(0);
     const [savingRecipe, setSavingRecipe] = useState<number | null>(null);
     const [savedRecipes, setSavedRecipes] = useState<Set<number>>(new Set());
@@ -32,6 +34,7 @@ export const ChefAI: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
     // Scroll to bottom on new message - DISABLED to prevent jumping on mobile
     // useEffect(() => {
@@ -348,6 +351,61 @@ export const ChefAI: React.FC = () => {
             window.speechSynthesis.cancel();
             setIsSpeaking(false);
         }
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+            setIsSpeaking(false);
+            setIsPaused(false);
+        }
+    };
+
+    // ElevenLabs TTS function (premium voice)
+    const speakTextElevenLabs = async (text: string) => {
+        try {
+            stopSpeaking();
+            setIsSpeaking(true);
+            setIsPaused(false);
+
+            const audioBlob = await generateSpeech(text);
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            const audio = new Audio(audioUrl);
+            audioRef.current = audio;
+
+            audio.onended = () => {
+                setIsSpeaking(false);
+                setIsPaused(false);
+                URL.revokeObjectURL(audioUrl);
+            };
+
+            audio.onerror = () => {
+                setIsSpeaking(false);
+                setIsPaused(false);
+            };
+
+            await audio.play();
+        } catch (error: any) {
+            console.error('ElevenLabs error:', error);
+            setIsSpeaking(false);
+            if (error.message?.includes('API key')) {
+                alert('ElevenLabs not configured. Add VITE_ELEVENLABS_API_KEY to .env');
+            }
+        }
+    };
+
+    // Pause/resume controls
+    const pauseSpeaking = () => {
+        if (audioRef.current && !audioRef.current.paused) {
+            audioRef.current.pause();
+            setIsPaused(true);
+        }
+    };
+
+    const resumeSpeaking = () => {
+        if (audioRef.current && audioRef.current.paused) {
+            audioRef.current.play();
+            setIsPaused(false);
+        }
     };
 
     // Save recipe from AI message
@@ -452,13 +510,23 @@ export const ChefAI: React.FC = () => {
                             </div>
                         )}
                         {isSpeaking && (
-                            <button
-                                onClick={stopSpeaking}
-                                className="absolute bottom-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-full font-bold flex items-center space-x-1 transition-all"
-                            >
-                                <StopCircle className="w-4 h-4" />
-                                <span>Stop</span>
-                            </button>
+                            isPaused ? (
+                                <button
+                                    onClick={resumeSpeaking}
+                                    className="absolute bottom-2 right-2 bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded-full font-bold flex items-center space-x-1 transition-all"
+                                >
+                                    <Play className="w-4 h-4" />
+                                    <span>Resume</span>
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={pauseSpeaking}
+                                    className="absolute bottom-2 right-2 bg-yellow-600 hover:bg-yellow-700 text-white text-xs px-3 py-2 rounded-full font-bold flex items-center space-x-1 transition-all"
+                                >
+                                    <Pause className="w-4 h-4" />
+                                    <span>Pause</span>
+                                </button>
+                            )
                         )}
                         {selectedImage && (Date.now() - lastFrameCapture < 2000) && (
                             <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center space-x-1">
@@ -495,7 +563,7 @@ export const ChefAI: React.FC = () => {
                                                 <ReactMarkdown>{msg.text}</ReactMarkdown>
                                                 {/* Read Aloud Button */}
                                                 <button
-                                                    onClick={() => speakText(msg.text!)}
+                                                    onClick={() => speakTextElevenLabs(msg.text!)}
                                                     className="mt-3 mr-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center space-x-2 bg-blue-600 text-white hover:bg-blue-700"
                                                 >
                                                     <Volume2 className="w-4 h-4" />
