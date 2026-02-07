@@ -17,11 +17,14 @@ export const ChefAI: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [listening, setListening] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isLiveMode, setIsLiveMode] = useState(false);
+    const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
     const recognitionRef = useRef<any>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     // Scroll to bottom on new message
     useEffect(() => {
@@ -41,6 +44,16 @@ export const ChefAI: React.FC = () => {
                 const transcript = event.results[0][0].transcript;
                 setInput(prev => prev + (prev ? ' ' : '') + transcript);
                 setListening(false);
+
+                // Auto-send in Live Mode
+                if (isLiveMode) {
+                    setTimeout(() => {
+                        setInput(transcript);
+                        // Trigger send
+                        const sendEvent = new Event('liveModeAutoSend');
+                        window.dispatchEvent(sendEvent);
+                    }, 500);
+                }
             };
 
             recognitionRef.current.onerror = (event: any) => {
@@ -50,9 +63,69 @@ export const ChefAI: React.FC = () => {
 
             recognitionRef.current.onend = () => {
                 setListening(false);
+                // Auto-restart in Live Mode
+                if (isLiveMode) {
+                    setTimeout(() => {
+                        try {
+                            recognitionRef.current?.start();
+                            setListening(true);
+                        } catch (e) {
+                            // Ignore if already started
+                        }
+                    }, 100);
+                }
             };
         }
-    }, []);
+    }, [isLiveMode]);
+
+    // Live Mode camera effect
+    useEffect(() => {
+        if (isLiveMode) {
+            // Start camera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+                .then(stream => {
+                    setCameraStream(stream);
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                    }
+                })
+                .catch(err => {
+                    console.error('Camera access denied:', err);
+                    alert('Camera access is required for Live Mode');
+                    setIsLiveMode(false);
+                });
+
+            // Start continuous voice
+            if (recognitionRef.current) {
+                try {
+                    recognitionRef.current.start();
+                    setListening(true);
+                } catch (e) {
+                    // Already started
+                }
+            }
+        } else {
+            // Stop camera
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                setCameraStream(null);
+            }
+            // Stop voice
+            if (recognitionRef.current && listening) {
+                recognitionRef.current.stop();
+            }
+        }
+
+        return () => {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, [isLiveMode]);
+
+    const toggleLiveMode = () => {
+        setIsLiveMode(!isLiveMode);
+    };
 
     const toggleListening = () => {
         if (!recognitionRef.current) {
@@ -135,6 +208,17 @@ export const ChefAI: React.FC = () => {
         }
     };
 
+    // Listen for Live Mode auto-send events
+    useEffect(() => {
+        const handleAutoSend = () => {
+            if (isLiveMode && input.trim()) {
+                handleSend();
+            }
+        };
+        window.addEventListener('liveModeAutoSend', handleAutoSend);
+        return () => window.removeEventListener('liveModeAutoSend', handleAutoSend);
+    }, [isLiveMode, input, messages, selectedImage, loading]);
+
     return (
         <div className="flex flex-col h-[100dvh] bg-black text-white pt-20 pb-4 md:px-4">
             <div className="flex-1 max-w-4xl mx-auto w-full bg-gray-900/40 md:border border-gray-800 md:rounded-2xl flex flex-col overflow-hidden relative shadow-2xl">
@@ -155,7 +239,36 @@ export const ChefAI: React.FC = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Live Mode Toggle */}
+                    <button
+                        onClick={toggleLiveMode}
+                        className={`px-4 py-2 rounded-full font-sans text-sm font-semibold transition-all duration-300 flex items-center space-x-2 ${isLiveMode
+                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/50 animate-pulse'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                            }`}
+                    >
+                        <Camera className="w-4 h-4" />
+                        <span>{isLiveMode ? 'LIVE' : 'Live Mode'}</span>
+                    </button>
                 </div>
+
+                {/* Live Mode Camera Feed */}
+                {isLiveMode && cameraStream && (
+                    <div className="absolute bottom-24 right-4 z-20 w-48 h-36 md:w-64 md:h-48 rounded-xl overflow-hidden border-2 border-red-500 shadow-2xl shadow-red-500/50">
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            playsInline
+                            muted
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center space-x-1 animate-pulse">
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                            <span>LIVE</span>
+                        </div>
+                    </div>
+                )}
 
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
@@ -172,7 +285,7 @@ export const ChefAI: React.FC = () => {
                                 )}
 
                                 {msg.text && (
-                                    <div className={`px-5 py-3 rounded-2xl text-sm md:text-base leading-relaxed font-sans shadow-md ${msg.role === 'user'
+                                    <div className={`px-5 py-3 rounded-2xl text-lg md:text-2xl leading-relaxed font-sans shadow-md ${msg.role === 'user'
                                         ? 'bg-culinary-gold text-black rounded-tr-sm'
                                         : 'bg-gray-800 text-gray-200 rounded-tl-sm border border-gray-700'
                                         }`}>
@@ -253,7 +366,7 @@ export const ChefAI: React.FC = () => {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyPress}
                                 placeholder={listening ? "Listening..." : "Ask your chef..."}
-                                className="flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-white placeholder-gray-500 font-sans h-10"
+                                className="flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-white text-lg placeholder-gray-400 font-sans h-12"
                                 disabled={loading}
                             />
 
