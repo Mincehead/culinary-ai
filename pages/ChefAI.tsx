@@ -26,10 +26,10 @@ export const ChefAI: React.FC = () => {
     const recognitionRef = useRef<any>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
 
-    // Scroll to bottom on new message
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    // Scroll to bottom on new message - DISABLED to prevent jumping on mobile
+    // useEffect(() => {
+    //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // }, [messages]);
 
     // Initialize Speech Recognition
     useEffect(() => {
@@ -81,18 +81,43 @@ export const ChefAI: React.FC = () => {
     // Live Mode camera effect
     useEffect(() => {
         if (isLiveMode) {
-            // Start camera
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+            // Start camera with fallback
+            const constraints = {
+                video: {
+                    facingMode: { ideal: 'environment' }
+                },
+                audio: false
+            };
+
+            navigator.mediaDevices.getUserMedia(constraints)
                 .then(stream => {
+                    console.log('Camera stream obtained:', stream);
                     setCameraStream(stream);
                     if (videoRef.current) {
                         videoRef.current.srcObject = stream;
+                        // Explicitly play the video
+                        videoRef.current.play().catch(err => {
+                            console.error('Video play error:', err);
+                        });
                     }
                 })
                 .catch(err => {
-                    console.error('Camera access denied:', err);
-                    alert('Camera access is required for Live Mode');
-                    setIsLiveMode(false);
+                    console.error('Camera access error:', err);
+                    // Try again without facingMode constraint
+                    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                        .then(stream => {
+                            console.log('Camera stream obtained (fallback):', stream);
+                            setCameraStream(stream);
+                            if (videoRef.current) {
+                                videoRef.current.srcObject = stream;
+                                videoRef.current.play().catch(e => console.error('Play error:', e));
+                            }
+                        })
+                        .catch(fallbackErr => {
+                            console.error('Camera fallback failed:', fallbackErr);
+                            alert('Camera access is required for Live Mode. Please check permissions.');
+                            setIsLiveMode(false);
+                        });
                 });
 
             // Start continuous voice
