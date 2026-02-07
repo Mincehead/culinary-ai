@@ -26,7 +26,7 @@ export const ChefAI: React.FC = () => {
     // Scroll to bottom on new message
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, loading]);
+    }, [messages]);
 
     // Initialize Speech Recognition
     useEffect(() => {
