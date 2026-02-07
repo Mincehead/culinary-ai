@@ -493,6 +493,14 @@ export const ChefAI: React.FC = () => {
                                         {msg.role === 'model' ? (
                                             <>
                                                 <ReactMarkdown>{msg.text}</ReactMarkdown>
+                                                {/* Read Aloud Button */}
+                                                <button
+                                                    onClick={() => speakText(msg.text!)}
+                                                    className="mt-3 mr-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center space-x-2 bg-blue-600 text-white hover:bg-blue-700"
+                                                >
+                                                    <Volume2 className="w-4 h-4" />
+                                                    <span>Read Aloud</span>
+                                                </button>
                                                 {/* Save Recipe Button - shows on messages > 100 chars */}
                                                 {msg.text.length > 100 && (
                                                     <button
