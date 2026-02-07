@@ -12,7 +12,7 @@ interface Message {
 
 export const ChefAI: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([
-        { role: 'model', text: "Bonjour! I am Lumière, your personal Executive Chef. Show me your ingredients, tell me what you're craving, or ask me anything about cooking. How can I help you today?" }
+        { role: 'model', text: "Bonjour! I'm Chef Lumière, your personal culinary master. I've spent decades in Michelin-starred kitchens around the world, and I'm here to help you cook like a pro.\n\nBefore we begin - what's your experience level in the kitchen? Are you just starting out, comfortable with basics, or an experienced home cook looking to refine your skills?\n\nAnd show me what you're working with! I can analyze ingredients, suggest dishes, and even show you visual representations of plated meals. What would you like to create today?" }
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
