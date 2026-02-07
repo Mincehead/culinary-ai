@@ -342,6 +342,14 @@ export const ChefAI: React.FC = () => {
         window.speechSynthesis.speak(utterance);
     };
 
+    // Stop speaking (interrupt)
+    const stopSpeaking = () => {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+        }
+    };
+
     // Save recipe from AI message
     const handleSaveRecipe = async (messageIndex: number, messageText: string) => {
         setSavingRecipe(messageIndex);
@@ -443,6 +451,15 @@ export const ChefAI: React.FC = () => {
                                 <span>🔊 Speaking</span>
                             </div>
                         )}
+                        {isSpeaking && (
+                            <button
+                                onClick={stopSpeaking}
+                                className="absolute bottom-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-full font-bold flex items-center space-x-1 transition-all"
+                            >
+                                <StopCircle className="w-4 h-4" />
+                                <span>Stop</span>
+                            </button>
+                        )}
                         {selectedImage && (Date.now() - lastFrameCapture < 2000) && (
                             <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center space-x-1">
                                 <span>👁️ AI Vision</span>
@@ -470,8 +487,8 @@ export const ChefAI: React.FC = () => {
 
                                 {msg.text && (
                                     <div className={`px-5 py-3 rounded-2xl text-lg md:text-2xl leading-relaxed font-sans shadow-md ${msg.role === 'user'
-                                            ? 'bg-culinary-gold text-black rounded-tr-sm'
-                                            : 'bg-gray-800 text-gray-200 rounded-tl-sm border border-gray-700'
+                                        ? 'bg-culinary-gold text-black rounded-tr-sm'
+                                        : 'bg-gray-800 text-gray-200 rounded-tl-sm border border-gray-700'
                                         }`}>
                                         {msg.role === 'model' ? (
                                             <>
@@ -482,8 +499,8 @@ export const ChefAI: React.FC = () => {
                                                         onClick={() => handleSaveRecipe(idx, msg.text!)}
                                                         disabled={savingRecipe === idx || savedRecipes.has(idx)}
                                                         className={`mt-3 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 ${savedRecipes.has(idx)
-                                                                ? 'bg-green-600 text-white cursor-default'
-                                                                : 'bg-culinary-gold text-black hover:bg-yellow-500'
+                                                            ? 'bg-green-600 text-white cursor-default'
+                                                            : 'bg-culinary-gold text-black hover:bg-yellow-500'
                                                             }`}
                                                     >
                                                         {savedRecipes.has(idx) ? (
