@@ -23,6 +23,8 @@ export async function synthesizeSpeech(
     text: string,
     voiceName: string = 'en-US-Neural2-D'
 ): Promise<Blob> {
+    console.log('🔑 Google TTS API Key present:', !!GOOGLE_TTS_API_KEY);
+
     if (!GOOGLE_TTS_API_KEY) {
         throw new Error('Google TTS API key not configured. Add VITE_GOOGLE_TTS_API_KEY to environment.');
     }

@@ -454,9 +454,13 @@ export const ChefAI: React.FC = () => {
             setIsSpeaking(true);
             setIsPaused(false);
 
+            console.log('🎙️ Attempting Google TTS...');
+
             // Use Deep Male voice
             const audioBlob = await synthesizeSpeech(text, RECOMMENDED_VOICES[0].name);
             const audioUrl = URL.createObjectURL(audioBlob);
+
+            console.log('✅ Google TTS audio generated successfully!');
 
             const audio = new Audio(audioUrl);
             audioRef.current = audio;
@@ -474,13 +478,18 @@ export const ChefAI: React.FC = () => {
 
             await audio.play();
         } catch (error: any) {
-            console.error('Google TTS error:', error);
+            console.error('❌ Google TTS error:', error);
+            console.error('Error message:', error.message);
             setIsSpeaking(false);
             setIsPaused(false);
 
             // Fallback to browser voice if not configured
             if (error.message?.includes('API key')) {
-                console.warn('Google TTS not configured, using browser voice');
+                console.warn('⚠️ Google TTS API key not configured - falling back to browser voice');
+                alert('Google TTS not configured. Using browser voice instead. Check console for details.');
+                speakText(text);
+            } else {
+                console.error('⚠️ Google TTS failed with unexpected error - falling back to browser voice');
                 speakText(text);
             }
         }
