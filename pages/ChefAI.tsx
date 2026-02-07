@@ -331,7 +331,7 @@ export const ChefAI: React.FC = () => {
         }
 
         utterance.rate = 0.95; // Slightly slower for clarity
-        utterance.pitch = 1.0;
+        utterance.pitch = 0.8; // Lower pitch for deeper male voice
         utterance.volume = 1.0;
 
         utterance.onstart = () => setIsSpeaking(true);
