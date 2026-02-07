@@ -83,6 +83,8 @@ export const ChefAI: React.FC = () => {
     // Live Mode camera effect
     useEffect(() => {
         if (isLiveMode) {
+            console.log('[Camera] Live Mode activated, requesting camera...');
+
             // Start camera with fallback
             const constraints = {
                 video: {
@@ -93,31 +95,53 @@ export const ChefAI: React.FC = () => {
 
             navigator.mediaDevices.getUserMedia(constraints)
                 .then(stream => {
-                    console.log('Camera stream obtained:', stream);
+                    console.log('[Camera] ✅ Stream obtained:', stream);
+                    console.log('[Camera] Video tracks:', stream.getVideoTracks());
+                    alert('Camera stream obtained! Tracks: ' + stream.getVideoTracks().length);
+
                     setCameraStream(stream);
+
                     if (videoRef.current) {
+                        console.log('[Camera] Setting video srcObject...');
                         videoRef.current.srcObject = stream;
+
                         // Explicitly play the video
-                        videoRef.current.play().catch(err => {
-                            console.error('Video play error:', err);
-                        });
+                        videoRef.current.play()
+                            .then(() => {
+                                console.log('[Camera] ✅ Video playing');
+                                alert('Video is now playing!');
+                            })
+                            .catch(err => {
+                                console.error('[Camera] ❌ Video play error:', err);
+                                alert('Video play error: ' + err.message);
+                            });
+                    } else {
+                        console.error('[Camera] ❌ Video ref is null');
+                        alert('Video element not found!');
                     }
                 })
                 .catch(err => {
-                    console.error('Camera access error:', err);
+                    console.error('[Camera] ❌ Initial request failed:', err);
+                    alert('Camera error: ' + err.message + '. Trying fallback...');
+
                     // Try again without facingMode constraint
                     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                         .then(stream => {
-                            console.log('Camera stream obtained (fallback):', stream);
+                            console.log('[Camera] ✅ Fallback stream obtained:', stream);
+                            alert('Camera fallback successful!');
+
                             setCameraStream(stream);
                             if (videoRef.current) {
                                 videoRef.current.srcObject = stream;
-                                videoRef.current.play().catch(e => console.error('Play error:', e));
+                                videoRef.current.play().catch(e => {
+                                    console.error('[Camera] Fallback play error:', e);
+                                    alert('Fallback play error: ' + e.message);
+                                });
                             }
                         })
                         .catch(fallbackErr => {
-                            console.error('Camera fallback failed:', fallbackErr);
-                            alert('Camera access is required for Live Mode. Please check permissions.');
+                            console.error('[Camera] ❌ Fallback failed:', fallbackErr);
+                            alert('Camera access denied: ' + fallbackErr.message + '. Please check permissions in browser settings.');
                             setIsLiveMode(false);
                         });
                 });
@@ -251,7 +275,7 @@ export const ChefAI: React.FC = () => {
         return () => window.removeEventListener('liveModeAutoSend', handleAutoSend);
     }, [isLiveMode, input, messages, selectedImage, loading]);
 
-    // Text-to-speech function
+    // Text-to-speech function with natural voice selection
     const speakText = (text: string) => {
         // Cancel any ongoing speech
         if (window.speechSynthesis.speaking) {
@@ -259,7 +283,22 @@ export const ChefAI: React.FC = () => {
         }
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
+
+        // Select the best available voice (preferring natural/Google voices)
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(voice =>
+            voice.name.includes('Google') ||
+            voice.name.includes('Natural') ||
+            voice.name.includes('Premium') ||
+            voice.name.includes('Enhanced')
+        ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+            console.log('Using voice:', preferredVoice.name);
+        }
+
+        utterance.rate = 0.95; // Slightly slower for clarity
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
 
