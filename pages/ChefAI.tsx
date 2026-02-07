@@ -339,30 +339,49 @@ export const ChefAI: React.FC = () => {
         return () => window.removeEventListener('liveModeAutoSend', handleAutoSend);
     }, [isLiveMode, input, messages, selectedImage, loading]);
 
-    // Text-to-speech function with natural voice selection
+    // Text-to-speech function with natural    // Speak text using browser TTS
     const speakText = (text: string) => {
         // Cancel any ongoing speech
         if (window.speechSynthesis.speaking) {
             window.speechSynthesis.cancel();
         }
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        // Small delay to ensure cancellation completes
+        setTimeout(() => {
+            const utterance = new SpeechSynthesisUtterance(text);
 
-        if (selectedVoice) {
-            utterance.voice = selectedVoice;
-            console.log('Using voice:', selectedVoice.name);
-        }
+            // Force reload voices to ensure we have the latest
+            const voices = window.speechSynthesis.getVoices();
 
-        utterance.rate = 0.95; // Slightly slower for clarity
-        utterance.pitch = 0.8; // Lower pitch for deeper male voice
-        utterance.volume = 1.0;
+            if (selectedVoice) {
+                // Find the voice again from the current list to ensure it's valid
+                const currentVoice = voices.find(v => v.name === selectedVoice.name);
+                if (currentVoice) {
+                    utterance.voice = currentVoice;
+                    console.log('🎙️ Using voice:', currentVoice.name, '(', currentVoice.lang, ')');
+                } else {
+                    console.warn('Selected voice not found, using default');
+                }
+            }
 
-        utterance.onstart = () => setIsSpeaking(true);
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
+            // Set voice parameters AFTER setting the voice
+            utterance.rate = 0.95;
+            utterance.pitch = 0.8;
+            utterance.volume = 1.0;
 
-        speechSynthesisRef.current = utterance;
-        window.speechSynthesis.speak(utterance);
+            utterance.onstart = () => {
+                setIsSpeaking(true);
+                console.log('Started speaking with:', utterance.voice?.name || 'default voice');
+            };
+            utterance.onend = () => setIsSpeaking(false);
+            utterance.onerror = (error) => {
+                console.error('Speech error:', error);
+                setIsSpeaking(false);
+            };
+
+            speechSynthesisRef.current = utterance;
+            window.speechSynthesis.speak(utterance);
+        }, 100);
     };
 
     // Stop speaking (interrupt)
@@ -500,7 +519,16 @@ export const ChefAI: React.FC = () => {
                                         onClick={() => {
                                             setSelectedVoice(voice);
                                             localStorage.setItem('preferredVoice', voice.name);
-                                            setShowVoiceSelector(false);
+
+                                            // Preview the voice
+                                            const testUtterance = new SpeechSynthesisUtterance('Hello, I am your chef assistant');
+                                            testUtterance.voice = voice;
+                                            testUtterance.rate = 0.95;
+                                            testUtterance.pitch = 0.8;
+                                            window.speechSynthesis.cancel();
+                                            window.speechSynthesis.speak(testUtterance);
+
+                                            setTimeout(() => setShowVoiceSelector(false), 1000);
                                         }}
                                         className={`w-full text-left p-4 rounded-lg transition-all flex items-center justify-between ${selectedVoice?.name === voice.name
                                             ? 'bg-culinary-gold text-black'
