@@ -447,6 +447,45 @@ export const ChefAI: React.FC = () => {
         }
     };
 
+    // Google Cloud TTS (FREE 1M chars/month!)
+    const speakTextGoogle = async (text: string) => {
+        try {
+            stopSpeaking();
+            setIsSpeaking(true);
+            setIsPaused(false);
+
+            // Use Deep Male voice
+            const audioBlob = await synthesizeSpeech(text, RECOMMENDED_VOICES[0].name);
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            const audio = new Audio(audioUrl);
+            audioRef.current = audio;
+
+            audio.onended = () => {
+                setIsSpeaking(false);
+                setIsPaused(false);
+                URL.revokeObjectURL(audioUrl);
+            };
+
+            audio.onerror = () => {
+                setIsSpeaking(false);
+                setIsPaused(false);
+            };
+
+            await audio.play();
+        } catch (error: any) {
+            console.error('Google TTS error:', error);
+            setIsSpeaking(false);
+            setIsPaused(false);
+
+            // Fallback to browser voice if not configured
+            if (error.message?.includes('API key')) {
+                console.warn('Google TTS not configured, using browser voice');
+                speakText(text);
+            }
+        }
+    };
+
     // Save recipe from AI message
     const handleSaveRecipe = async (messageIndex: number, messageText: string) => {
         setSavingRecipe(messageIndex);
@@ -679,7 +718,7 @@ export const ChefAI: React.FC = () => {
                                                 <ReactMarkdown>{msg.text}</ReactMarkdown>
                                                 {/* Read Aloud Button */}
                                                 <button
-                                                    onClick={() => speakText(msg.text!)}
+                                                    onClick={() => speakTextGoogle(msg.text!)}
                                                     className="mt-3 mr-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center space-x-2 bg-blue-600 text-white hover:bg-blue-700"
                                                 >
                                                     <Volume2 className="w-4 h-4" />
