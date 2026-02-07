@@ -26,9 +26,6 @@ export const ChefAI: React.FC = () => {
     const [lastFrameCapture, setLastFrameCapture] = useState<number>(0);
     const [savingRecipe, setSavingRecipe] = useState<number | null>(null);
     const [savedRecipes, setSavedRecipes] = useState<Set<number>>(new Set());
-    const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
-    const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
-    const [showVoiceSelector, setShowVoiceSelector] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,32 +35,6 @@ export const ChefAI: React.FC = () => {
     const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-
-    // Load available voices
-    useEffect(() => {
-        const loadVoices = () => {
-            const voices = window.speechSynthesis.getVoices();
-            setAvailableVoices(voices);
-
-            // Load saved preference or set default
-            const savedVoiceName = localStorage.getItem('preferredVoice');
-            if (savedVoiceName) {
-                const voice = voices.find(v => v.name === savedVoiceName);
-                if (voice) setSelectedVoice(voice);
-            } else {
-                // Default to best available voice
-                const defaultVoice = voices.find(v =>
-                    v.name.toLowerCase().includes('male') ||
-                    v.name.toLowerCase().includes('google') ||
-                    v.name.toLowerCase().includes('natural')
-                ) || voices[0];
-                setSelectedVoice(defaultVoice);
-            }
-        };
-
-        loadVoices();
-        window.speechSynthesis.onvoiceschanged = loadVoices;
-    }, []);
 
     // Scroll to bottom on new message - DISABLED to prevent jumping on mobile
     // useEffect(() => {
@@ -339,51 +310,6 @@ export const ChefAI: React.FC = () => {
         return () => window.removeEventListener('liveModeAutoSend', handleAutoSend);
     }, [isLiveMode, input, messages, selectedImage, loading]);
 
-    // Text-to-speech function with natural    // Speak text using browser TTS
-    const speakText = (text: string) => {
-        // Cancel any ongoing speech
-        if (window.speechSynthesis.speaking) {
-            window.speechSynthesis.cancel();
-        }
-
-        // Small delay to ensure cancellation completes
-        setTimeout(() => {
-            const utterance = new SpeechSynthesisUtterance(text);
-
-            // Force reload voices to ensure we have the latest
-            const voices = window.speechSynthesis.getVoices();
-
-            if (selectedVoice) {
-                // Find the voice again from the current list to ensure it's valid
-                const currentVoice = voices.find(v => v.name === selectedVoice.name);
-                if (currentVoice) {
-                    utterance.voice = currentVoice;
-                    console.log('🎙️ Using voice:', currentVoice.name, '(', currentVoice.lang, ')');
-                } else {
-                    console.warn('Selected voice not found, using default');
-                }
-            }
-
-            // Set voice parameters AFTER setting the voice
-            utterance.rate = 0.95;
-            utterance.pitch = 0.8;
-            utterance.volume = 1.0;
-
-            utterance.onstart = () => {
-                setIsSpeaking(true);
-                console.log('Started speaking with:', utterance.voice?.name || 'default voice');
-            };
-            utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = (error) => {
-                console.error('Speech error:', error);
-                setIsSpeaking(false);
-            };
-
-            speechSynthesisRef.current = utterance;
-            window.speechSynthesis.speak(utterance);
-        }, 100);
-    };
-
     // Stop speaking (interrupt)
     const stopSpeaking = () => {
         if (window.speechSynthesis.speaking) {
@@ -483,14 +409,13 @@ export const ChefAI: React.FC = () => {
             setIsSpeaking(false);
             setIsPaused(false);
 
-            // Fallback to browser voice if not configured
+            // Show error if not configured
             if (error.message?.includes('API key')) {
-                console.warn('⚠️ Google TTS API key not configured - falling back to browser voice');
-                alert('Google TTS not configured. Using browser voice instead. Check console for details.');
-                speakText(text);
+                console.warn('⚠️ Google TTS API key not configured');
+                alert('Voice feature requires Google TTS API key. Please contact support.');
             } else {
-                console.error('⚠️ Google TTS failed with unexpected error - falling back to browser voice');
-                speakText(text);
+                console.error('⚠️ Google TTS failed with unexpected error');
+                alert('Voice playback failed: ' + error.message);
             }
         }
     };
@@ -535,76 +460,7 @@ export const ChefAI: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-900 text-white relative overflow-hidden">
-            {/* Voice Selector Modal */}
-            {showVoiceSelector && (
-                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-                    <div className="bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col border border-gray-700">
-                        {/* Header */}
-                        <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-                            <div>
-                                <h2 className="text-2xl font-bold">Select Voice</h2>
-                                <p className="text-sm text-gray-400 mt-1">
-                                    Current: {selectedVoice?.name || 'None selected'}
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setShowVoiceSelector(false)}
-                                className="text-gray-400 hover:text-white p-2"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        {/* Voice List */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-2">
-                            {availableVoices.length === 0 ? (
-                                <p className="text-gray-400 text-center py-8">Loading voices...</p>
-                            ) : (
-                                availableVoices.map((voice, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => {
-                                            setSelectedVoice(voice);
-                                            localStorage.setItem('preferredVoice', voice.name);
-
-                                            // Preview the voice
-                                            const testUtterance = new SpeechSynthesisUtterance('Hello, I am your chef assistant');
-                                            testUtterance.voice = voice;
-                                            testUtterance.rate = 0.95;
-                                            testUtterance.pitch = 0.8;
-                                            window.speechSynthesis.cancel();
-                                            window.speechSynthesis.speak(testUtterance);
-
-                                            setTimeout(() => setShowVoiceSelector(false), 1000);
-                                        }}
-                                        className={`w-full text-left p-4 rounded-lg transition-all flex items-center justify-between ${selectedVoice?.name === voice.name
-                                            ? 'bg-culinary-gold text-black'
-                                            : 'bg-gray-800 hover:bg-gray-700 text-white'
-                                            }`}
-                                    >
-                                        <div>
-                                            <div className="font-semibold">{voice.name}</div>
-                                            <div className="text-sm opacity-70">
-                                                {voice.lang} • {voice.localService ? 'Local' : 'Online'}
-                                            </div>
-                                        </div>
-                                        {(voice.name.toLowerCase().includes('google') ||
-                                            voice.name.toLowerCase().includes('enhanced') ||
-                                            voice.name.toLowerCase().includes('premium')) && (
-                                                <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded-full">
-                                                    Premium
-                                                </span>
-                                            )}
-                                    </button>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Background decoration */}
+        <div className="flex flex-col h-[100dvh] bg-black text-white pt-20 pb-4 md:px-4">
             <div className="flex-1 max-w-4xl mx-auto w-full bg-gray-900/40 md:border border-gray-800 md:rounded-2xl flex flex-col overflow-hidden relative shadow-2xl">
 
                 {/* Header */}
@@ -632,16 +488,6 @@ export const ChefAI: React.FC = () => {
                     >
                         <Camera className="w-5 h-5" />
                         <span>{isLiveMode ? 'Stop Live' : 'Live Mode'}</span>
-                    </button>
-
-                    {/* Voice Selector Button */}
-                    <button
-                        onClick={() => setShowVoiceSelector(true)}
-                        className="px-4 py-2 rounded-lg font-semibold bg-purple-600 hover:bg-purple-700 transition-all flex items-center space-x-2"
-                        title={`Current voice: ${selectedVoice?.name || 'None'}`}
-                    >
-                        <Volume2 className="w-5 h-5" />
-                        <span>Voice</span>
                     </button>
                 </div>
 
