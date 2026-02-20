@@ -43,7 +43,7 @@ export const RecipeList: React.FC = () => {
                 setRecipes(result);
             } catch (err: any) {
                 console.error(err);
-                setError("The AI Chef is busy. Please try again.");
+                setError(err.message || "The AI Chef is busy. Please try again.");
             } finally {
                 setLoading(false);
             }
