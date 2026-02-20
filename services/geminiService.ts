@@ -13,8 +13,8 @@ const getAiClient = () => {
   return new GoogleGenAI({ apiKey });
 };
 
-const MODEL_NAME = "gemini-2.5-flash";
-const IMAGE_MODEL_NAME = "gemini-2.5-flash";
+const MODEL_NAME = "gemini-1.5-flash";
+const IMAGE_MODEL_NAME = "gemini-1.5-flash";
 
 export const generateRecipeList = async (
   cuisine: CuisineType | null,
