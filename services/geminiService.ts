@@ -22,19 +22,27 @@ export const generateRecipeList = async (
   dietary: string[] = [],
   searchQuery?: string
 ): Promise<RecipeSummary[]> => {
+  console.log('[generateRecipeList] Called with:', { cuisine, tag, dietary, searchQuery });
   const ai = getAiClient();
 
   const dietaryContext = dietary.length > 0 ? ` that are strictly ${dietary.join(" and ")}` : "";
 
   let prompt = "";
   if (searchQuery) {
-    prompt = `Generate a list of 4 distinct and popular recipes${dietaryContext} that match the search query "${searchQuery}". 
-    If the query implies a specific cuisine, focus on that.`;
+    // NEW: Treated as a Menu / Ingredient Challenge
+    prompt = `You are an expert Executive Chef creating a curated menu based on the user's request: "${searchQuery}".
+    
+    1. If the input is a list of ingredients (e.g., "chicken, rice, peppers"), suggest 4 DISTINCT recipes that can be made primarily with these ingredients.
+    2. If the input is a specific dish name (e.g., "Steak"), suggest a 4-course menu featuring it (e.g., Appetizer, Main: Steak, Side, Dessert).
+    3. If the input is a mood or abstract concept (e.g., "date night", "healthy lunch"), suggest 4 recipes that fit perfectly.
+    
+    The output MUST be a list of 4 distinct recipes.${dietaryContext}`;
   } else {
     prompt = `Generate a list of 4 distinct and popular ${cuisine} recipes${dietaryContext} that fit the category "${tag}".`;
   }
 
   prompt += ` Provide a short description, prep time, difficulty level, and a single keyword to search for an image.`;
+  console.log('[generateRecipeList] Generated prompt:', prompt.substring(0, 100) + '...');
 
   const schema: Schema = {
     type: Type.ARRAY,
@@ -52,9 +60,10 @@ export const generateRecipeList = async (
   };
 
   try {
+    console.log('[generateRecipeList] Making API call to:', MODEL_NAME);
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
-      contents: prompt,
+      contents: [{ parts: [{ text: prompt }] }],
       config: {
         responseMimeType: "application/json",
         responseSchema: schema,
@@ -62,12 +71,20 @@ export const generateRecipeList = async (
       },
     });
 
+    console.log('[generateRecipeList] ✅ API call successful');
     const text = response.text;
     if (!text) return [];
     return JSON.parse(text) as RecipeSummary[];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating recipe list:", error);
-    throw new Error("Failed to fetch recipes from the AI Chef.");
+    console.error("Error details:", {
+      message: error?.message,
+      status: error?.status,
+      statusText: error?.statusText,
+      response: error?.response,
+      stack: error?.stack
+    });
+    throw new Error(`Failed to fetch recipes from the AI Chef. Details: ${error?.message || JSON.stringify(error)}`);
   }
 };
 
@@ -118,7 +135,7 @@ export const generateRecipeDetail = async (
 
     const apiCallPromise = ai.models.generateContent({
       model: MODEL_NAME,
-      contents: prompt,
+      contents: [{ parts: [{ text: prompt }] }],
       config: {
         responseMimeType: "application/json",
         responseSchema: schema,
@@ -137,51 +154,6 @@ export const generateRecipeDetail = async (
   } catch (error) {
     console.error("Error generating recipe detail:", error);
     throw new Error("Failed to retrieve the detailed recipe.");
-  }
-};
-
-export const generateChefReply = async (
-  history: { role: 'user' | 'model'; parts: { text: string }[] }[]
-): Promise<string> => {
-  const ai = getAiClient();
-
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      config: {
-        systemInstruction: `You are Lumière, a world-renowned Executive Chef and culinary master with over 30 years experience across Michelin-starred kitchens worldwide. Your expertise spans French haute cuisine, Italian traditions, Asian culinary arts, molecular gastronomy, and everything in between.
-
-YOUR PERSONALITY: You speak with authority of someone who has trained under culinary legends. You are passionate, warm, and genuinely excited to share knowledge. You ask thoughtful questions about skill level, available tools, dietary needs, and preferences. You proactively offer creative suggestions and alternatives. You share insider techniques and chef secrets beyond cookbook recipes.
-
-YOUR APPROACH:
-1. Assess & Understand: Ask about their skill level, available ingredients, equipment, time constraints, dietary preferences
-2. Educate & Inspire: Share the 'why' behind techniques. Explain flavor science, ingredient interactions, professional shortcuts
-3. Be Proactive: Suggest dish ideas. Offer variations, substitutions, creative twists
-4. Visual Guidance: When suggesting meals, mention "I can show you what this would look like!" and encourage asking for visual representations
-5. Skill Building: Tailor advice to their level. For beginners, simplify and encourage. For advanced cooks, challenge with refined techniques
-
-IMPORTANT BEHAVIORS:
-- Always assess skill level first in new conversations
-- Ask clarifying questions before giving recipes (e.g. "Do you have a stand mixer?" "How much time?")
-- Suggest 2-3 options when appropriate, at different difficulty levels
-- Mention image generation: "Would you like me to show you how the plated dish should look?"
-- Be conversational: You're a mentor, not reading from a textbook
-- Share pro tips: "In professional kitchens we..." or "A trick I learned in Lyon..."
-
-Remember: You're not just giving recipes, you're teaching someone to THINK like a chef. Be engaging, interactive, inspiring!`,
-        maxOutputTokens: 500,
-      },
-      contents: history
-    });
-
-    return response.text || "I'm sorry, I couldn't come up with a response.";
-  } catch (error: any) {
-    console.error("Error in chef chat:", error);
-    // Be more specific if possible
-    if (error.response?.promptFeedback?.blockReason) {
-      return `I cannot process this image due to safety settings (${error.response.promptFeedback.blockReason}). Please try another image.`;
-    }
-    throw new Error(`Gemini API Error: ${error.message || JSON.stringify(error)}`);
   }
 };
 

@@ -5,7 +5,7 @@ import Background from '../components/Background';
 import { AuthModal } from '../components/AuthModal';
 import { useAuth } from '../contexts/AuthContext';
 import { CuisineType, RecipeTag, DietaryRequirement } from '../types';
-import { ChevronRight, Search, Globe, Wheat, Flame, Check, User, LogOut, Camera, ArrowRight, ChefHat } from 'lucide-react';
+import { ChevronRight, Search, Globe, Wheat, Flame, Check, User, LogOut, Camera } from 'lucide-react';
 import { ReviewsSection } from '../components/ReviewsSection';
 
 export const LandingPage: React.FC = () => {
@@ -99,7 +99,7 @@ export const LandingPage: React.FC = () => {
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search for a specific dish..."
+                                placeholder="Enter ingredients (e.g. chicken, rice) or a dish name..."
                                 className="w-full bg-black/60 border border-gray-600 focus:border-culinary-gold rounded-full py-4 pl-12 pr-6 text-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-culinary-gold/50 transition-all font-serif backdrop-blur-md shadow-xl"
                             />
                             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 group-focus-within:text-culinary-gold transition-colors" />
@@ -110,13 +110,6 @@ export const LandingPage: React.FC = () => {
                                 <ChevronRight className="w-5 h-5" />
                             </button>
                         </form>
-                        <div className="mt-8 text-center">
-                            <Link to="/chef-ai" className="inline-flex items-center px-6 py-3 border border-culinary-gold/50 rounded-full text-culinary-gold hover:bg-culinary-gold hover:text-culinary-dark transition-all duration-300 font-sans tracking-widest text-sm group">
-                                <ChefHat className="w-5 h-5 mr-2" />
-                                <span className="mr-1">TALK TO CHEF AI</span>
-                                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                        </div>
                     </section>
 
                     <section className="mb-12">
