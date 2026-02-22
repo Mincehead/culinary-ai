@@ -13,8 +13,8 @@ const getAiClient = () => {
   return new GoogleGenAI({ apiKey });
 };
 
-const MODEL_NAME = "gemini-1.5-flash";
-const IMAGE_MODEL_NAME = "gemini-1.5-flash";
+const MODEL_NAME = "gemini-2.0-flash";
+const IMAGE_MODEL_NAME = "gemini-2.0-flash";
 
 export const generateRecipeList = async (
   cuisine: CuisineType | null,
@@ -187,7 +187,7 @@ export const generateRecipeFromImage = async (
     console.log(`[geminiService] analyzing image (${mimeType}) with gemini-1.5-flash...`);
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.0-flash",
       contents: [
         {
           parts: [
