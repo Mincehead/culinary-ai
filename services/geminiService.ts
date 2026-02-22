@@ -237,37 +237,15 @@ const base64ToBlob = (base64: string, mimeType: string) => {
 
 export const generateImage = async (
   prompt: string,
-  size: ImageSize,
-  aspectRatio: string = "16:9"
+  _size: ImageSize,
+  _aspectRatio: string = "16:9"
 ): Promise<string> => {
-  // Always create a new client
-  const ai = getAiClient();
+  // Use Pollinations.ai for image generation (free, no API key needed)
+  // gemini-2.5-flash is a text-only model and cannot generate images.
+  const seed = prompt.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const encodedPrompt = encodeURIComponent(prompt);
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=600&nologo=true&seed=${seed}&model=flux`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: IMAGE_MODEL_NAME,
-      contents: {
-        parts: [{ text: prompt }]
-      },
-      config: {
-        imageConfig: {
-          aspectRatio: aspectRatio,
-          imageSize: size
-        }
-      },
-    });
-
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        const base64String = part.inlineData.data;
-        return `data:image/png;base64,${base64String}`;
-      }
-    }
-    throw new Error("No image data found in response");
-  } catch (error) {
-    console.error("Error generating image:", error);
-    throw error;
-  }
 };
 
 import { supabase } from "./supabaseClient";
