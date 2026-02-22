@@ -1,8 +1,8 @@
-// Quick test script - node test-gemini-api.js
-const { GoogleGenAI, Type } = require("@google/genai");
+// Quick test script - node test-gemini-api.mjs
+import { GoogleGenAI, Type } from "@google/genai";
 
 const API_KEY = "AIzaSyA1qTbFOE1Mze2bL8x2CsMlPGxwMbNaHy4";
-const MODEL = "gemini-2.0-flash-001";
+const MODEL = "gemini-2.5-flash";
 
 async function test() {
     console.log("Testing with model:", MODEL);
@@ -34,10 +34,13 @@ async function test() {
             },
         });
 
-        console.log("✅ SUCCESS! Response text:", response.text.substring(0, 200));
+        console.log("✅ SUCCESS! Response:", response.text.substring(0, 300));
     } catch (err) {
         console.error("❌ FAILED:", err.message);
-        console.error("Full error:", JSON.stringify(err, null, 2));
+        try {
+            const parsed = JSON.parse(err.message);
+            console.error("Error details:", JSON.stringify(parsed, null, 2));
+        } catch (_) { }
     }
 }
 
